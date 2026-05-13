@@ -1,15 +1,20 @@
+
 import { Route, Routes } from "react-router"
-import Home from "./pages/Home"
+import UserLayout from "./layout/UserLayout"
+import ListUsers from "./pages/ListUsers"
+import UserForm from "./pages/UserForm"
 
 function App() {
 
   return (
     <>
-      <div>
-      <Routes>
-        <Route path= "/" element={<Home/>}/>
-      </Routes>
-      </div>
+     <Routes>
+      <Route path="/" element = {<UserLayout/> }>
+      <Route path="/list-users" element={<ListUsers />} />
+      <Route path="/user-form" element={<UserForm />} />
+
+      </Route>
+     </Routes>
     </>
   )
 }
