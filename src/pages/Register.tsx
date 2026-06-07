@@ -3,10 +3,13 @@ import {User,Mail,Lock,Eye,ChevronDown,} from "lucide-react";
 import { useNavigate } from "react-router";
 import api from "../api/axios";
 
+
+
 type RegisterForm = {
   username: string;
   email: string;
   password: string;
+  role: string;
 };
 
 export default function Register() {
@@ -14,7 +17,8 @@ export default function Register() {
   const[form, setForm] = useState<RegisterForm>({
     username:"",
     email:"",
-    password:""
+    password:"",
+    role: ""
   });
 
   const handleChange = (
@@ -24,6 +28,15 @@ export default function Register() {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+  const handleSelectChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+
+    setForm({
+      ...form,
+      role : e.target.value,
     });
   };
 
@@ -141,10 +154,13 @@ export default function Register() {
             </label>
 
             <div className="relative">
-              <select className="w-full border border-gray-200 rounded-lg px-4 py-3 appearance-none outline-none focus:ring-1 focus:ring-red-300">
-                <option>Tourist</option>
-                <option>Guide</option>
-                <option>Admin</option>
+              <select
+              name="role"
+              value={form.role}
+              onChange={handleSelectChange} 
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 appearance-none outline-none focus:ring-1 focus:ring-red-300">
+                <option value = "USER">User</option>
+                <option value = "Guide">Guide</option>
               </select>
 
               <ChevronDown

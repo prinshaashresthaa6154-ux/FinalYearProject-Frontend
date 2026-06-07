@@ -14,8 +14,16 @@ type LoginForm = {
   password: string;
 };
 
+type User={
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+
 type LoginResponse = {
   token: string;
+  userDTO: User;
 };
 
 const Login = () => {
@@ -51,7 +59,7 @@ const Login = () => {
           form
         );
 
-      login(response.data.token);
+      login(response.data.token, response.data.userDTO);
 
       navigate("/homepage");
 

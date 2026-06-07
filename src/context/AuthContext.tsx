@@ -1,3 +1,4 @@
+import { User } from "lucide-react";
 import {
   createContext,
   useContext,
@@ -6,10 +7,18 @@ import {
   type ReactNode,
 } from "react";
 
+type User={
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+};
+
 type AuthContextType = {
   token: string | null;
+  userDTO: User | null;
   isAuthenticated: boolean;
-  login: (jwtToken: string) => void;
+  login: (jwtToken: string, userData: User) => void;
   logout: () => void;
 };
 
@@ -34,29 +43,42 @@ export const AuthProvider = ({
   const [isAuthenticated, setIsAuthenticated] =
     useState<boolean>(!!token);
 
+    const[user,setUser] = useState<User | null>(() =>{
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser): null;
+    });
+
   useEffect(() => {
 
+
     if (token) {
-
       localStorage.setItem("token", token);
-
+      if(user){
+        localStorage.setItem("user", JSON.stringify(user));
+      }
       setIsAuthenticated(true);
 
     } else {
 
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
       setIsAuthenticated(false);
     }
 
-  }, [token]);
+  }, [token, user]);
 
-  const login = (jwtToken: string) => {
+
+  const login = (jwtToken: string, userData: User) => {
     setToken(jwtToken);
+    setUser(userData);
   };
 
   const logout = () => {
     setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+      localStorage.removeItem("user");
   };
 
   return (
@@ -66,6 +88,7 @@ export const AuthProvider = ({
         isAuthenticated,
         login,
         logout,
+        userDTO: user
       }}
     >
       {children}

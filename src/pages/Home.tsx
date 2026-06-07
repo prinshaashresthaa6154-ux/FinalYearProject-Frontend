@@ -166,7 +166,7 @@ function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 font-display">
               Explore by Category
             </h2>
 
@@ -203,7 +203,7 @@ function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-3 font-display">
                 Top Destinations
               </h2>
 
@@ -247,7 +247,7 @@ function HomePage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 font-display">
               Popular Tour Packages
             </h2>
 
@@ -333,7 +333,7 @@ function HomePage() {
       {/* WHY CHOOSE US */}
       <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-12 font-display">
             Why Choose Nepal Yatra?
           </h2>
 
@@ -381,7 +381,7 @@ function HomePage() {
       {/* CTA */}
       <section className="py-20 bg-white">
         <div className="max-w-2xl mx-auto text-center px-4">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-display">
             Ready to Explore Nepal?
           </h2>
 
