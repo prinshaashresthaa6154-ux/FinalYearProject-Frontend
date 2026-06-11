@@ -72,8 +72,12 @@ const Login = () => {
   };
 
   const [showPassword, setShowPassword] = useState(false);
-
+  
+  const googleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
   return (
+
     <div className="min-h-screen flex flex-col bg-[#f7f5f4]">
       
       {/* Main Content */}
@@ -164,6 +168,7 @@ const Login = () => {
 
               {/* Google Login */}
               <button
+              onClick={googleLogin}
                 type="button"
                 className="w-full h-11 border border-gray-300 rounded-md flex items-center justify-center gap-3 hover:bg-gray-50 transition"
               >

@@ -8,6 +8,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import DestinationDetail from "./pages/Destination"
 import EverestBooking from "./pages/TripDetails"
+import OAuthSuccess from "./pages/0AuthSuccess"
 
 function App() {
 
@@ -22,7 +23,10 @@ function App() {
       <Route path="/register" element={<Register/>}/>
       <Route path="/destinations" element={<DestinationDetail/>}/>
       <Route path="/tripdetail" element={<EverestBooking/>}/>
+
       </Route>
+
+      <Route path="/oauth-success" element={<OAuthSuccess />} />
      </Routes>
     </>
   )
