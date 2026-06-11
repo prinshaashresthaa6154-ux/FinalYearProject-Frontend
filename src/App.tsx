@@ -6,6 +6,8 @@ import UserForm from "./pages/UserForm"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import DestinationDetail from "./pages/Destination"
+import EverestBooking from "./pages/TripDetails"
 
 function App() {
 
@@ -18,7 +20,8 @@ function App() {
       <Route path="/homepage" element={<Home/>}/>
       <Route path="/login" element={<Login/>}/>
       <Route path="/register" element={<Register/>}/>
-
+      <Route path="/destinations" element={<DestinationDetail/>}/>
+      <Route path="/tripdetail" element={<EverestBooking/>}/>
       </Route>
      </Routes>
     </>
