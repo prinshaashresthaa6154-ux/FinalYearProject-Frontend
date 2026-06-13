@@ -9,6 +9,9 @@ import Register from "./pages/Register"
 import DestinationDetail from "./pages/Destination"
 import EverestBooking from "./pages/TripDetails"
 import OAuthSuccess from "./pages/0AuthSuccess"
+import SuperAdminDashboard from "./pages/SuperAdmin"
+import AllAccountsPanel from "./pages/AllAccount"
+import SystemLogsPanel from "./pages/SystemLog"
 
 function App() {
 
@@ -23,6 +26,10 @@ function App() {
       <Route path="/register" element={<Register/>}/>
       <Route path="/destinations" element={<DestinationDetail/>}/>
       <Route path="/tripdetail" element={<EverestBooking/>}/>
+      <Route path="/superadmin" element={<SuperAdminDashboard/>}/>
+      <Route path="/allaccount" element={<AllAccountsPanel/>}/>
+      <Route path="/systemlog" element={<SystemLogsPanel/>}/>
+      
 
       </Route>
 
