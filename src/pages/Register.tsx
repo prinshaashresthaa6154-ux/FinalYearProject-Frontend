@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import {User,Mail,Lock,Eye,ChevronDown,} from "lucide-react";
-import { useNavigate } from "react-router";
+import { User, Mail, Lock, Eye, ChevronDown } from "lucide-react";
+import { NavLink, useNavigate } from "react-router";
 import api from "../api/axios";
-
-
 
 type RegisterForm = {
   username: string;
@@ -14,63 +12,49 @@ type RegisterForm = {
 
 export default function Register() {
   const navigate = useNavigate();
-  const[form, setForm] = useState<RegisterForm>({
-    username:"",
-    email:"",
-    password:"",
-    role: ""
+  const [form, setForm] = useState<RegisterForm>({
+    username: "",
+    email: "",
+    password: "",
+    role: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
-  const handleSelectChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setForm({
       ...form,
-      role : e.target.value,
+      role: e.target.value,
     });
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
+  const googleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-
-      await api.post(
-        "/auth/register",
-        form
-      );
-
-      alert("Registration successful");
-
-      navigate("/login");
-
+      await api.post("/auth/register", form);
+      navigate("/otp", {
+        state: {
+          email: form.email,
+        },
+      });
     } catch (error) {
-
-      console.error(error);
-
-      alert("Registration failed");
+      console.log(error);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-[#f8f5f5] flex items-center justify-center px-4">
       <div className="w-full max-w-lg mt-12 mb-12">
-
-
         {/* Heading */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-[#2d1f1f] mb-3">
@@ -81,14 +65,14 @@ export default function Register() {
             Create Account
           </h2>
 
-          <p className="text-gray-500">
-            Join Nepal Yatra and start exploring
-          </p>
+          <p className="text-gray-500">Join Nepal Yatra and start exploring</p>
         </div>
 
         {/* Card */}
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] p-8">
-
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border border-gray-200 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] p-8"
+        >
           {/* Full Name */}
           <div className="mb-5">
             <label className="flex items-center gap-2 text-sm mb-2 font-medium text-gray-700">
@@ -155,12 +139,14 @@ export default function Register() {
 
             <div className="relative">
               <select
-              name="role"
-              value={form.role}
-              onChange={handleSelectChange} 
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 appearance-none outline-none focus:ring-1 focus:ring-red-300">
-                <option value = "USER">User</option>
-                <option value = "Guide">Guide</option>
+                name="role"
+                value={form.role}
+                onChange={handleSelectChange}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 appearance-none outline-none focus:ring-1 focus:ring-red-300"
+              >
+                <option value="">Select Role</option>
+                <option value="USER">User</option>
+                <option value="Guide">Guide</option>
               </select>
 
               <ChevronDown
@@ -171,17 +157,21 @@ export default function Register() {
           </div>
 
           {/* Button */}
-          <button type="submit" className="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-medium transition">
+          <button
+            type="submit"
+            className="w-full bg-red-700 hover:bg-red-800 text-white py-3 rounded-lg font-medium transition"
+          >
             Create Account
           </button>
 
           {/* Divider */}
-          <div className="text-center my-5 text-gray-400">
-            Or
-          </div>
+          <div className="text-center my-5 text-gray-400">Or</div>
 
           {/* Google */}
-          <button className="w-full border border-gray-200 rounded-lg py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition">
+          <button
+            onClick={googleLogin}
+            className="w-full border border-gray-200 rounded-lg py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition"
+          >
             Continue with
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -193,9 +183,11 @@ export default function Register() {
           {/* Footer */}
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
-            <span className="text-red-700 font-medium cursor-pointer">
-              Sign In
-            </span>
+            <NavLink to="/login">
+              <span className="text-red-700 font-medium cursor-pointer">
+                Sign In
+              </span>
+            </NavLink>
           </p>
         </form>
       </div>

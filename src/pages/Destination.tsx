@@ -1,11 +1,12 @@
 import React from 'react';
 import { MapPin, ArrowLeft, CheckCircle2, Star } from 'lucide-react';
-
+import everest from "../assets/Everest-base.jpeg"
+import { NavLink } from 'react-router';
 // Structured Destination Details Object
 const DESTINATION_DATA = {
   title: "Everest Base Camp",
   location: "Solukhumbu, Koshi Province",
-  heroImage: "https://unsplash.com",
+  heroImage: "https:// unsplash.com",
   about: "The Everest Base Camp trek is the ultimate adventure for mountain lovers. Follow the footsteps of legendary mountaineers through the Khumbu region, passing through Sherpa villages, ancient monasteries, and breathtaking glacial valleys. The trek offers unparalleled views of Mt. Everest (8,848m), Lhotse, Nuptse, and Ama Dablam.",
   highlights: [
     "Kala Patthar viewpoint",
@@ -56,8 +57,8 @@ export default function EverestBaseCampDetails() {
       
       {/* Hero Header Section */}
       <div 
-        className="relative w-full h-[320px] bg-cover bg-center" 
-        style={{ backgroundImage: `url('${data.heroImage}')` }}
+        className="relative w-full h-[400px] bg-center" 
+        style={{ backgroundImage: `url('${everest}')` }}
       >
         <div className="absolute inset-0 bg-black/15"></div>
         
@@ -169,9 +170,11 @@ export default function EverestBaseCampDetails() {
               </div>
             </div>
 
+              <NavLink to="/tripdetail">
             <button className="w-full bg-[#AF1D1D] hover:bg-[#911818] text-white font-semibold py-3 rounded-lg shadow-md shadow-red-900/10 transition-colors">
               Book Now
             </button>
+            </NavLink>
           </div>
 
           {/* Emergency Protocols Block */}

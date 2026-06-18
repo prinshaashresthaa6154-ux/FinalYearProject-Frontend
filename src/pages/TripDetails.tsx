@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Check } from 'lucide-react';
+import { NavLink } from 'react-router';
 
 export default function EverestBooking() {
   const [travelDate, setTravelDate] = useState<string>('');
@@ -123,18 +124,22 @@ export default function EverestBooking() {
 
               {/* Form Navigation Controls */}
               <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                
                 <button 
                   type="button"
                   className="px-6 py-2.5 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
                 >
                   Back
                 </button>
+
+                <NavLink to="/travelerinfo">
                 <button 
                   type="button"
                   className="px-8 py-3 rounded-xl bg-[#b81d24] text-white font-bold shadow-md shadow-red-100 hover:bg-[#9c181e] active:scale-[0.98] transition-all"
                 >
                   Continue
                 </button>
+                </NavLink>
               </div>
             </form>
           </div>

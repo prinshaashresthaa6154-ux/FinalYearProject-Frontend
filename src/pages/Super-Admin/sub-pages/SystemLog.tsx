@@ -23,32 +23,7 @@ export default function SystemLogsPanel() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fdfbf9] text-[#2c2520] font-sans antialiased p-4 md:p-8 max-w-7xl mx-auto space-y-6">
-      
-      {/* Navigation Tabs */}
-      <div className="overflow-x-auto scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
-        <nav className="flex space-x-2 md:space-x-4 items-center whitespace-nowrap min-w-max">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.name;
-            return (
-              <button
-                key={tab.name}
-                onClick={() => setActiveTab(tab.name)}
-                className={`flex items-center gap-2 px-5 py-2.5 text-[14px] font-medium transition-all duration-200 rounded-xl ${
-                  isActive
-                    ? 'bg-[#b31919] text-white shadow-sm'
-                    : 'text-[#6e5e54] hover:text-[#b31919] hover:bg-[#efece9]'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{tab.name}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
+    <div className="min-h-screen bg-[#fdfbf9] text-[#2c2520] font-sans antialiased py-4 max-w-7xl mx-auto space-y-6">
       {/* Main Activity Logs Container Card */}
       <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
         

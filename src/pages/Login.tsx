@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import { useNavigate } from "react-router";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
@@ -14,12 +9,12 @@ type LoginForm = {
   password: string;
 };
 
-type User={
+type User = {
   id: number;
   username: string;
   email: string;
   role: string;
-}
+};
 
 type LoginResponse = {
   token: string;
@@ -27,63 +22,46 @@ type LoginResponse = {
 };
 
 const Login = () => {
-
   const navigate = useNavigate();
-  const [form, setform] = useState<LoginForm>({
-   email:"",
-   password:"",
-  })
-  const {login} = useAuth();
+  const [form, setForm] = useState<LoginForm>({
+    email: "",
+    password: "",
+  });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const { login } = useAuth();
 
-    setform({
+  const googleLogin = () => {
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-
-      const response =
-        await api.post<LoginResponse>(
-          "/auth/login",
-          form
-        );
-
+      const response = await api.post<LoginResponse>("/auth/login", form);
       login(response.data.token, response.data.userDTO);
-
-      navigate("/homepage");
-
+      alert("Login Success");
+      navigate("/");
     } catch (error) {
-
-      console.error(error);
-
+      console.log(error);
       alert("Invalid credentials");
     }
   };
 
   const [showPassword, setShowPassword] = useState(false);
-  
-  const googleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  };
-  return (
 
+  return (
     <div className="min-h-screen flex flex-col bg-[#f7f5f4]">
-      
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md mt-12 mb-8">
-
           {/* Heading */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-[#2d1f1f] font-serif mb-4">
@@ -100,9 +78,7 @@ const Login = () => {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-            
             <form onSubmit={handleSubmit} className="space-y-5">
-
               {/* Email */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-[#2d1f1f] mb-2">
@@ -144,11 +120,7 @@ const Login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500"
                   >
-                    {showPassword ? (
-                      <EyeOff size={18} />
-                    ) : (
-                      <Eye size={18} />
-                    )}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -162,13 +134,11 @@ const Login = () => {
               </button>
 
               {/* OR */}
-              <div className="text-center text-gray-500 text-sm">
-                Or
-              </div>
+              <div className="text-center text-gray-500 text-sm">Or</div>
 
               {/* Google Login */}
               <button
-              onClick={googleLogin}
+                onClick={googleLogin}
                 type="button"
                 className="w-full h-11 border border-gray-300 rounded-md flex items-center justify-center gap-3 hover:bg-gray-50 transition"
               >
@@ -188,20 +158,20 @@ const Login = () => {
               {/* Signup */}
               <p className="text-center text-sm text-[#7c6f66]">
                 Don&apos;t have an account?{" "}
-                <span className="text-red-700 font-medium cursor-pointer hover:underline">
+                <NavLink
+                  to="/register"
+                  className="text-red-700 font-medium cursor-pointer hover:underline"
+                >
                   Sign Up
-                </span>
+                </NavLink>
               </p>
-
             </form>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="p-4 text-gray-500 text-sm">
-        Footer
-      </footer>
+      <footer className="p-4 text-gray-500 text-sm">Footer</footer>
     </div>
   );
 };

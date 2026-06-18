@@ -8,6 +8,7 @@ export default function EverestTravelerDetails() {
   const [nationality, setNationality] = useState('');
 
   return (
+    <>
     <div className="min-h-screen bg-[#fbf9f6] text-[#2d2d2d] font-sans antialiased">
       
       {/* Hero Banner Section */}
@@ -206,5 +207,14 @@ export default function EverestTravelerDetails() {
               <span className="text-2xl font-bold text-[#b81d24]">
                 $1,200
               </span>
-              );
+              </div>
+              </div>
+              </div>
+              
+              </div>
+              </div>
+
+              </>
+                  );
               }
+

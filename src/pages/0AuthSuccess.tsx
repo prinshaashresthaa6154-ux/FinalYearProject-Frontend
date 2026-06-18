@@ -24,13 +24,11 @@ function OAuthSuccess() {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Before login");
 
         login(token, response.data);
-        console.log("After login");
 
         setTimeout(() => {
-          navigate("/homepage");
+          navigate("/");
         }, 100);
         console.log("After navigate");
       } catch (error) {
