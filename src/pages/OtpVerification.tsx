@@ -58,40 +58,12 @@ const OtpVerification = () => {
       <div className="w-full max-w-[480px] px-6 text-center">
         {/* Logo Section */}
         <div className="flex items-center justify-center gap-2 mb-4">
-          <svg
-            className="w-6 h-6 text-[#9E2A2B]"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4.5 19.5l7.5-15 7.5 15m-15 0H19.5m-15 0l7.5-7.5 7.5 7.5"
-            />
-          </svg>
-
           <span className="text-xl font-bold text-[#1F1F1F]">Nepal Yatra</span>
         </div>
 
         {/* Shield Icon */}
         <div className="flex justify-center mb-6">
-          <div className="w-10 h-10 rounded-full bg-[#FBEBEB] flex items-center justify-center text-[#D97475]">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-          </div>
+          <div className="w-10 h-10 rounded-full bg-[#FBEBEB] flex items-center justify-center text-[#D97475]"></div>
         </div>
 
         {/* Heading */}
