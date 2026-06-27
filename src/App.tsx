@@ -15,6 +15,8 @@ import SystemOverview from "./pages/Super-Admin/sub-pages/SystemOverview";
 import EverestTravelerDetails from "./pages/TravelerInfo";
 import OtpVerification from "./pages/OtpVerification";
 import BookGuide from "./pages/BookGuide";
+import GuideProfile from "./pages/GuideProfile";
+import GuideBooking from "./pages/GuideBooking";
 
 function App() {
   return (
@@ -28,8 +30,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
-          <Route path="/guide" element={<BookGuide />} />
           <Route path="/destinations" element={<DestinationDetail />} />
+          <Route path="/guide" element={<BookGuide />} />
+          <Route path="/guide/:id/book" element={<GuideBooking />} />
+          <Route path="/guide/:id" element={<GuideProfile />} />
           <Route path="/tripdetail" element={<EverestBooking />} />
           <Route path="/travelerinfo" element={<EverestTravelerDetails />} />
           <Route path="/superadmin" element={<SuperAdminDashboard />}>
