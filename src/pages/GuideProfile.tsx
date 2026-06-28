@@ -9,7 +9,7 @@ import {
   Medal,
   MessageCircle,
 } from "lucide-react";
-import { getGuideById } from "../data/guide";
+import { getGuideById } from "../data/guides";
 
 function StarRating({ rating }: { rating: number }) {
   return (

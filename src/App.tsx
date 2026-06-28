@@ -14,9 +14,13 @@ import SystemLogsPanel from "./pages/Super-Admin/sub-pages/SystemLog";
 import SystemOverview from "./pages/Super-Admin/sub-pages/SystemOverview";
 import EverestTravelerDetails from "./pages/TravelerInfo";
 import OtpVerification from "./pages/OtpVerification";
+import GroupTrips from "./pages/GroupTrips";
 import BookGuide from "./pages/BookGuide";
 import GuideProfile from "./pages/GuideProfile";
 import GuideBooking from "./pages/GuideBooking";
+import TripDetailsStep from "./pages/Guide-Booking/TripDetailsStep";
+import YourInfoStep from "./pages/Guide-Booking/YourInfoStep";
+import PaymentStep from "./pages/Guide-Booking/PaymentStep";
 
 function App() {
   return (
@@ -31,8 +35,13 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
           <Route path="/destinations" element={<DestinationDetail />} />
+          <Route path="/grouptrips" element={<GroupTrips />} />
           <Route path="/guide" element={<BookGuide />} />
-          <Route path="/guide/:id/book" element={<GuideBooking />} />
+          <Route path="/guide/:id/book" element={<GuideBooking />}>
+            <Route index element={<TripDetailsStep />} />
+            <Route path="your-info" element={<YourInfoStep />} />
+            <Route path="payment" element={<PaymentStep />} />
+          </Route>
           <Route path="/guide/:id" element={<GuideProfile />} />
           <Route path="/tripdetail" element={<EverestBooking />} />
           <Route path="/travelerinfo" element={<EverestTravelerDetails />} />

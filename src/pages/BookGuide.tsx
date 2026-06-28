@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Search, MapPin, Clock, Briefcase, Globe, Star } from "lucide-react";
-import { GUIDES } from "../data/guide";
+import { GUIDES } from "../data/guides";
 
 const FILTERS = [
   "All",

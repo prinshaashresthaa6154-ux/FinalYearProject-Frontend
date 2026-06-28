@@ -33,10 +33,10 @@ export default function Navbar() {
             Destinations
           </NavLink>
           <NavLink
-            to="/packages"
+            to="/grouptrips"
             className="hover:text-gray-400 transition-colors"
           >
-            Packages
+            Group Trips
           </NavLink>
           <NavLink
             to="/guide"
