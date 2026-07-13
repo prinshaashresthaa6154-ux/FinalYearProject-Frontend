@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Trophy,
   MapPin,
@@ -8,77 +9,14 @@ import {
   MessageCircle,
   UserPlus,
 } from "lucide-react";
+import { GROUP_TRIPS } from "../data/groupTrips";
+import { useGroupTrip } from "../context/GroupTripContext";
 
 const FILTERS = ["All Trips", "Available", "Easy", "Moderate"];
 
-const GROUP_TRIPS = [
-  {
-    id: 1,
-    title: "Everest Base Camp Group Trek",
-    location: "Everest Region",
-    description:
-      "Join fellow trekkers on the iconic journey to Everest Base Camp with an expert Sherpa guide.",
-    date: "April 5–18, 2026",
-    duration: "14 days",
-    guide: "Pemba Sherpa",
-    tags: ["Namche Bazaar", "Tengboche Monastery"],
-    joined: 8,
-    capacity: 12,
-    difficulty: "Moderate",
-    price: 1100,
-    spotsLeft: 4,
-  },
-  {
-    id: 2,
-    title: "Annapurna Circuit Group Tour",
-    location: "Annapurna Region",
-    description:
-      "Circle the Annapurna massif with a diverse group of adventurers through varied landscapes.",
-    date: "May 10–22, 2026",
-    duration: "12 days",
-    guide: "Ang Sherpa",
-    tags: ["Thorong La Pass", "Manang Valley"],
-    joined: 7,
-    capacity: 12,
-    difficulty: "Moderate",
-    price: 950,
-    spotsLeft: 5,
-  },
-  {
-    id: 3,
-    title: "Kathmandu Cultural Walk",
-    location: "Kathmandu Valley",
-    description:
-      "Explore UNESCO heritage sites and hidden alleys of the Kathmandu Valley with a local historian.",
-    date: "March 15–17, 2026",
-    duration: "3 days",
-    guide: "Sita Gurung",
-    tags: ["Pashupatinath", "Patan Durbar Square"],
-    joined: 8,
-    capacity: 12,
-    difficulty: "Easy",
-    price: 280,
-    spotsLeft: 4,
-  },
-  {
-    id: 4,
-    title: "Chitwan Safari Group",
-    location: "Chitwan National Park",
-    description:
-      "Spot rhinos, elephants, and exotic birds on a shared jungle safari adventure.",
-    date: "June 1–5, 2026",
-    duration: "4 days",
-    guide: "Maya Karki",
-    tags: ["Jungle Safari", "Canoe Ride"],
-    joined: 7,
-    capacity: 12,
-    difficulty: "Easy",
-    price: 420,
-    spotsLeft: 5,
-  },
-];
-
 export default function GroupTrips() {
+  const navigate = useNavigate();
+  const { isJoined, joinTrip } = useGroupTrip();
   const [activeFilter, setActiveFilter] = useState("All Trips");
 
   const filteredTrips = GROUP_TRIPS.filter((trip) => {
@@ -88,6 +26,18 @@ export default function GroupTrips() {
     if (activeFilter === "Moderate") return trip.difficulty === "Moderate";
     return true;
   });
+
+  const handleJoinTrip = (tripId: number) => {
+    joinTrip(tripId);
+    navigate(`/grouptrips/${tripId}/chat`);
+  };
+
+  const handleGroupChat = (tripId: number) => {
+    if (!isJoined(tripId)) {
+      return;
+    }
+    navigate(`/grouptrips/${tripId}/chat`);
+  };
 
   return (
     <div className="min-h-screen bg-[#F7F3F0] font-sans">
@@ -128,6 +78,7 @@ export default function GroupTrips() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {filteredTrips.map((trip) => {
               const progress = (trip.joined / trip.capacity) * 100;
+              const joined = isJoined(trip.id);
 
               return (
                 <div
@@ -202,14 +153,31 @@ export default function GroupTrips() {
                       </span>
                     </p>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button className="flex items-center gap-1.5 text-sm text-gray-600 border border-gray-200 font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap">
+                      <button
+                        onClick={() => handleGroupChat(trip.id)}
+                        disabled={!joined}
+                        className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition-colors ${
+                          joined
+                            ? "text-gray-600 border border-gray-200 hover:bg-gray-50"
+                            : "text-gray-400 border border-gray-100 cursor-not-allowed"
+                        }`}
+                      >
                         <MessageCircle className="w-4 h-4" />
                         Group Chat
                       </button>
-                      <button className="flex items-center gap-1.5 bg-[#A51C1C] text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-[#8e1818] transition-colors whitespace-nowrap">
-                        <UserPlus className="w-4 h-4" />
-                        Join Trip
-                      </button>
+                      {joined ? (
+                        <span className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
+                          Joined
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleJoinTrip(trip.id)}
+                          className="flex items-center gap-1.5 bg-[#A51C1C] text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-[#8e1818] transition-colors whitespace-nowrap"
+                        >
+                          <UserPlus className="w-4 h-4" />
+                          Join Trip
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
