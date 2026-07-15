@@ -241,7 +241,7 @@ export default function GuideProfile() {
 
                 <div className="space-y-3 mb-6">
                   <button
-                    onClick={() => navigate(`/guide/${guide.id}/book`)}
+                    onClick={() => navigate(`/guidebook/${guide.id}`)}
                     className="w-full bg-[#A51C1C] text-white font-semibold py-3 rounded-lg hover:bg-[#8e1818] transition-colors"
                   >
                     Book Now

@@ -11,7 +11,6 @@ createRoot(document.getElementById("root")!).render(
       <GroupTripProvider>
         <App />
       </GroupTripProvider>
-      <App />
     </AuthProvider>
   </BrowserRouter>,
 );

@@ -16,7 +16,7 @@ export default function YourInfoStep() {
 
   useEffect(() => {
     if (!tripDetails.startDate || !tripDetails.destination) {
-      navigate(`/guide/${id}/book`, { replace: true });
+      navigate(`/guidebook/${id}/`, { replace: true });
     }
   }, [tripDetails, id, navigate]);
 
@@ -25,12 +25,12 @@ export default function YourInfoStep() {
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
     setYourInfo({ fullName, email, phone });
-    navigate(`/guide/${guide.id}/book/payment`);
+    navigate(`/guidebook/${guide.id}/payment`);
   };
 
   const handleBack = () => {
     setYourInfo({ fullName, email, phone });
-    navigate(`/guide/${guide.id}/book`);
+    navigate(`/guidebook/${guide.id}`);
   };
 
   return (
@@ -94,7 +94,9 @@ export default function YourInfoStep() {
             <button
               type="submit"
               className="flex-1 bg-[#A51C1C] text-white font-semibold py-3.5 rounded-lg hover:bg-[#8e1818] transition-colors"
-            ></button>
+            >
+              Continue
+            </button>
           </div>
         </form>
       </div>

@@ -14,6 +14,9 @@ import SystemLogsPanel from "./pages/Super-Admin/sub-pages/SystemLog";
 import SystemOverview from "./pages/Super-Admin/sub-pages/SystemOverview";
 import PlatformSettings from "./pages/Super-Admin/sub-pages/PlatformSettings";
 import Analytics from "./pages/Super-Admin/sub-pages/Analytics";
+import GuideDashboard from "./pages/Guide-Dashboard/GuideDashboard";
+import GuideOverview from "./pages/Guide-Dashboard/sub-pages/Overview";
+import GuidePlaceholder from "./pages/Guide-Dashboard/sub-pages/Placeholder";
 import EverestTravelerDetails from "./pages/TravelerInfo";
 import OtpVerification from "./pages/OtpVerification";
 import GroupTrips from "./pages/GroupTrips";
@@ -40,12 +43,12 @@ function App() {
           <Route path="/grouptrips" element={<GroupTrips />} />
           <Route path="/groupchat" element={<GroupChat />} />
           <Route path="/guide" element={<BookGuide />} />
-          <Route path="/guidebook" element={<GuideBooking />}>
+          <Route path="/guidebook/:id/" element={<GuideBooking />}>
             <Route index element={<TripDetailsStep />} />
             <Route path="your-info" element={<YourInfoStep />} />
             <Route path="payment" element={<PaymentStep />} />
           </Route>
-          <Route path="/guideprofile" element={<GuideProfile />} />
+          <Route path="/guideprofile/:id" element={<GuideProfile />} />
           <Route path="/tripdetail" element={<EverestBooking />} />
           <Route path="/travelerinfo" element={<EverestTravelerDetails />} />
           <Route path="/superadmin" element={<SuperAdminDashboard />}>
@@ -61,6 +64,29 @@ function App() {
               element={<PlatformSettings />}
             />
             <Route path="/superadmin/analytics" element={<Analytics />} />
+          </Route>
+          <Route path="/guidedashboard" element={<GuideDashboard />}>
+            <Route index element={<GuideOverview />} />
+            <Route
+              path="trips"
+              element={<GuidePlaceholder title="My Trips" />}
+            />
+            <Route
+              path="requests"
+              element={<GuidePlaceholder title="Group Requests" />}
+            />
+            <Route
+              path="messages"
+              element={<GuidePlaceholder title="Messages" />}
+            />
+            <Route
+              path="reviews"
+              element={<GuidePlaceholder title="Reviews" />}
+            />
+            <Route
+              path="profile"
+              element={<GuidePlaceholder title="Profile" />}
+            />
           </Route>
         </Route>
 

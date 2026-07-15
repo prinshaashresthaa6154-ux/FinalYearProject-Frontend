@@ -156,13 +156,13 @@ export default function BookGuide() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guideprofile/${guide.id}`)}
                       className="text-sm text-gray-600 hover:text-gray-800 font-medium whitespace-nowrap"
                     >
                       View Profile
                     </button>
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guideprofile/${guide.id}`)}
                       className="bg-[#A51C1C] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[#8e1818] transition-colors whitespace-nowrap"
                     >
                       Book Guide

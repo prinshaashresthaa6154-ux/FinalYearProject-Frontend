@@ -1,0 +1,106 @@
+import {
+  ArrowLeft,
+  Bell,
+  Settings,
+  LayoutDashboard,
+  Map,
+  Users,
+  MessageSquare,
+  Star,
+  User,
+} from 'lucide-react';
+import { Outlet, useLocation, useNavigate } from 'react-router';
+
+export default function GuideDashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const tabs = [
+    { id: 1, name: 'Overview', icon: LayoutDashboard, path: '/guidedashboard' },
+    { id: 2, name: 'My Trips', icon: Map, path: '/guidedashboard/trips' },
+    { id: 3, name: 'Group Requests', icon: Users, path: '/guidedashboard/requests' },
+    { id: 4, name: 'Messages', icon: MessageSquare, path: '/guidedashboard/messages' },
+    { id: 5, name: 'Reviews', icon: Star, path: '/guidedashboard/reviews' },
+    { id: 6, name: 'Profile', icon: User, path: '/guidedashboard/profile' },
+  ];
+
+  const activeTab =
+    tabs.find((tab) =>
+      tab.path === '/guidedashboard'
+        ? location.pathname === '/guidedashboard'
+        : location.pathname.startsWith(tab.path),
+    )?.name ?? 'Overview';
+
+  return (
+    <div className="min-h-screen bg-[#fdfbf9] text-[#2c2520] font-sans antialiased">
+      {/* Header */}
+      <header className="bg-[#fdfbf9] border-b border-[#efece9] py-4">
+        <div className="max-w-7xl w-full mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="text-gray-400 hover:text-[#2c2520] transition"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="w-10 h-10 rounded-full bg-[#1e1611] text-[#f5efe9] flex items-center justify-center text-sm font-semibold">
+              PS
+            </div>
+            <div>
+              <h1 className="text-base font-semibold text-[#1a130e] tracking-tight">
+                Pemba Sherpa
+              </h1>
+              <p className="text-xs text-gray-400">Freelance Guide Dashboard</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="relative text-gray-500 hover:text-[#2c2520] p-1.5 transition"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#b31919] rounded-full" />
+            </button>
+            <button
+              type="button"
+              className="text-gray-500 hover:text-[#2c2520] p-1.5 transition"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="py-6 max-w-7xl mx-auto px-4 space-y-8">
+        {/* Tabs */}
+        <div className="overflow-x-auto scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
+          <nav className="flex space-x-2 md:space-x-3 items-center whitespace-nowrap min-w-max">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.name;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => navigate(tab.path)}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-[14px] font-medium transition-all duration-200 rounded-xl ${
+                    isActive
+                      ? 'bg-[#b31919] text-white shadow-sm'
+                      : 'text-[#6e5e54] hover:text-[#b31919] hover:bg-[#efece9]'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <Outlet />
+      </main>
+    </div>
+  );
+}

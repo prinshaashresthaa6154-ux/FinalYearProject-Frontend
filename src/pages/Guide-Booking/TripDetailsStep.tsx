@@ -40,7 +40,7 @@ export default function TripDetailsStep() {
       specialRequest,
     };
     setTripDetails(details);
-    navigate(`/guide/${guide.id}/book/your-info`);
+    navigate(`/guidebook/${guide.id}/your-info`);
   };
 
   return (
