@@ -8,6 +8,7 @@ import {
   MessageCircle,
   X,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 const stats = [
   {
@@ -83,6 +84,8 @@ const joinRequests = [
 ];
 
 export default function GuideOverview() {
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-8">
       {/* Metric cards */}
@@ -118,6 +121,7 @@ export default function GuideOverview() {
           </h2>
           <button
             type="button"
+            onClick={() => navigate('/guidedashboard/trips')}
             className="text-sm font-medium text-[#b31919] hover:underline"
           >
             View All
@@ -169,6 +173,7 @@ export default function GuideOverview() {
           </div>
           <button
             type="button"
+            onClick={() => navigate('/guidedashboard/requests')}
             className="text-sm font-medium text-[#b31919] hover:underline shrink-0"
           >
             View All

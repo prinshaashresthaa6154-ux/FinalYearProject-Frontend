@@ -4,12 +4,15 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import { GroupTripProvider } from "./context/GroupTripContext.tsx";
+import { GuideAvatarProvider } from "./pages/Guide-Dashboard/GuideAvatarContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <AuthProvider>
       <GroupTripProvider>
-        <App />
+        <GuideAvatarProvider>
+          <App />
+        </GuideAvatarProvider>
       </GroupTripProvider>
     </AuthProvider>
   </BrowserRouter>,

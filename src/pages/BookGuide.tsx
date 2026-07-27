@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Search, MapPin, Clock, Briefcase, Globe, Star } from "lucide-react";
 import { GUIDES } from "../data/guides";
+import { DASHBOARD_GUIDE_ID, getGuideAvatarUrl } from "../utils/guideAvatar";
+import { useGuideAvatarOptional } from "./Guide-Dashboard/GuideAvatarContext";
 
 const FILTERS = [
   "All",
@@ -16,6 +18,8 @@ export default function BookGuide() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const avatarCtx = useGuideAvatarOptional();
+  const pembaAvatar = avatarCtx?.avatarUrl ?? getGuideAvatarUrl();
 
   const filteredGuides = GUIDES.filter((guide) => {
     const matchesFilter =
@@ -84,10 +88,18 @@ export default function BookGuide() {
                 {/* Card Header */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#A51C1C] flex items-center justify-center shrink-0">
-                      <span className="text-white text-xs font-semibold">
-                        {guide.initials}
-                      </span>
+                    <div className="w-10 h-10 rounded-full bg-[#A51C1C] overflow-hidden flex items-center justify-center shrink-0">
+                      {guide.id === DASHBOARD_GUIDE_ID && pembaAvatar ? (
+                        <img
+                          src={pembaAvatar}
+                          alt={guide.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white text-xs font-semibold">
+                          {guide.initials}
+                        </span>
+                      )}
                     </div>
                     <div className="min-w-0">
                       <h2 className="font-display font-bold text-[#1A1A1A] text-base leading-tight">

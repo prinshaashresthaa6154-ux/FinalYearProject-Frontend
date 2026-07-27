@@ -16,7 +16,14 @@ import PlatformSettings from "./pages/Super-Admin/sub-pages/PlatformSettings";
 import Analytics from "./pages/Super-Admin/sub-pages/Analytics";
 import GuideDashboard from "./pages/Guide-Dashboard/GuideDashboard";
 import GuideOverview from "./pages/Guide-Dashboard/sub-pages/Overview";
-import GuidePlaceholder from "./pages/Guide-Dashboard/sub-pages/Placeholder";
+import MyTrips from "./pages/Guide-Dashboard/sub-pages/MyTrips";
+import GroupRequests from "./pages/Guide-Dashboard/sub-pages/GroupRequests";
+import Clients from "./pages/Guide-Dashboard/sub-pages/Clients";
+import Earnings from "./pages/Guide-Dashboard/sub-pages/Earnings";
+import Messages from "./pages/Guide-Dashboard/sub-pages/Messages";
+import Reviews from "./pages/Guide-Dashboard/sub-pages/Reviews";
+import GuideNotifications from "./pages/Guide-Dashboard/sub-pages/GuideNotifications";
+import GuideProfilePage from "./pages/Guide-Dashboard/sub-pages/GuideProfilePage";
 import EverestTravelerDetails from "./pages/TravelerInfo";
 import OtpVerification from "./pages/OtpVerification";
 import GroupTrips from "./pages/GroupTrips";
@@ -67,26 +74,14 @@ function App() {
           </Route>
           <Route path="/guidedashboard" element={<GuideDashboard />}>
             <Route index element={<GuideOverview />} />
-            <Route
-              path="trips"
-              element={<GuidePlaceholder title="My Trips" />}
-            />
-            <Route
-              path="requests"
-              element={<GuidePlaceholder title="Group Requests" />}
-            />
-            <Route
-              path="messages"
-              element={<GuidePlaceholder title="Messages" />}
-            />
-            <Route
-              path="reviews"
-              element={<GuidePlaceholder title="Reviews" />}
-            />
-            <Route
-              path="profile"
-              element={<GuidePlaceholder title="Profile" />}
-            />
+            <Route path="trips" element={<MyTrips />} />
+            <Route path="requests" element={<GroupRequests />} />
+            <Route path="clients" element={<Clients />} />
+            <Route path="earnings" element={<Earnings />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="reviews" element={<Reviews />} />
+            <Route path="notifications" element={<GuideNotifications />} />
+            <Route path="profile" element={<GuideProfilePage />} />
           </Route>
         </Route>
 
