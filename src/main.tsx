@@ -1,14 +1,22 @@
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
+import { BrowserRouter } from "react-router";
+import { AuthProvider } from "./context/AuthContext.tsx";
+import { GroupTripProvider } from "./context/GroupTripContext.tsx";
+import { GuideAvatarProvider } from "./pages/Guide-Dashboard/GuideAvatarContext.tsx";
+import { AdminPlatformProvider } from "./context/AdminPlatformContext.tsx";
 
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-import { BrowserRouter } from 'react-router'
-import { AuthProvider } from './context/AuthContext.tsx'
-
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <AuthProvider>
-      <App/>
+      <GroupTripProvider>
+        <GuideAvatarProvider>
+          <AdminPlatformProvider>
+            <App />
+          </AdminPlatformProvider>
+        </GuideAvatarProvider>
+      </GroupTripProvider>
     </AuthProvider>
   </BrowserRouter>,
-)
+);

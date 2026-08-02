@@ -10,6 +10,8 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { getGuideById } from "../data/guides";
+import { DASHBOARD_GUIDE_ID, getGuideAvatarUrl } from "../utils/guideAvatar";
+import { useGuideAvatarOptional } from "./Guide-Dashboard/GuideAvatarContext";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -32,6 +34,11 @@ export default function GuideProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const guide = getGuideById(Number(id));
+  const avatarCtx = useGuideAvatarOptional();
+  const avatarUrl =
+    guide?.id === DASHBOARD_GUIDE_ID
+      ? (avatarCtx?.avatarUrl ?? getGuideAvatarUrl())
+      : null;
 
   if (!guide) {
     return (
@@ -64,10 +71,18 @@ export default function GuideProfile() {
 
           <div className="flex items-start justify-between gap-6">
             <div className="flex items-start gap-5 min-w-0">
-              <div className="w-16 h-16 md:w-[72px] md:h-[72px] rounded-full bg-[#C44B4B] flex items-center justify-center shrink-0">
-                <span className="text-white text-lg font-semibold">
-                  {guide.initials}
-                </span>
+              <div className="w-16 h-16 md:w-[72px] md:h-[72px] rounded-full bg-[#C44B4B] overflow-hidden flex items-center justify-center shrink-0">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={guide.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white text-lg font-semibold">
+                    {guide.initials}
+                  </span>
+                )}
               </div>
 
               <div className="min-w-0">
@@ -241,7 +256,7 @@ export default function GuideProfile() {
 
                 <div className="space-y-3 mb-6">
                   <button
-                    onClick={() => navigate(`/guide/${guide.id}/book`)}
+                    onClick={() => navigate(`/guidebook/${guide.id}`)}
                     className="w-full bg-[#A51C1C] text-white font-semibold py-3 rounded-lg hover:bg-[#8e1818] transition-colors"
                   >
                     Book Now

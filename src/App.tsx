@@ -12,9 +12,34 @@ import SuperAdminDashboard from "./pages/Super-Admin/SuperAdmin";
 import AllAccountsPanel from "./pages/Super-Admin/sub-pages/AllAccount";
 import SystemLogsPanel from "./pages/Super-Admin/sub-pages/SystemLog";
 import SystemOverview from "./pages/Super-Admin/sub-pages/SystemOverview";
+import PlatformSettings from "./pages/Super-Admin/sub-pages/PlatformSettings";
+import Analytics from "./pages/Super-Admin/sub-pages/Analytics";
+import GuideDashboard from "./pages/Guide-Dashboard/GuideDashboard";
+import GuideOverview from "./pages/Guide-Dashboard/sub-pages/Overview";
+import MyTrips from "./pages/Guide-Dashboard/sub-pages/MyTrips";
+import GroupRequests from "./pages/Guide-Dashboard/sub-pages/GroupRequests";
+import Clients from "./pages/Guide-Dashboard/sub-pages/Clients";
+import Earnings from "./pages/Guide-Dashboard/sub-pages/Earning";
+import Messages from "./pages/Guide-Dashboard/sub-pages/Messages";
+import Reviews from "./pages/Guide-Dashboard/sub-pages/Reviews";
+import GuideNotifications from "./pages/Guide-Dashboard/sub-pages/GuideNotifications";
+import GuideProfilePage from "./pages/Guide-Dashboard/sub-pages/GuideProfilePage";
+import AdminDashboard from "./pages/Admin/Admin";
+import AdminOverview from "./pages/Admin/sub-pages/AdminOverview";
+import AdminUsers from "./pages/Admin/sub-pages/AdminUsers";
+import AdminGuides from "./pages/Admin/sub-pages/AdminGuides";
+import AdminDestinations from "./pages/Admin/sub-pages/AdminDestinations";
+import AdminTrips from "./pages/Admin/sub-pages/AdminTrips";
+import AdminBookings from "./pages/Admin/sub-pages/AdminBooking";
+import AdminGroupTrips from "./pages/Admin/sub-pages/AdminGroupTrips";
+import AdminReviews from "./pages/Admin/sub-pages/AdminReview";
+import AdminNotifications from "./pages/Admin/sub-pages/AdminNotification";
+import AdminReports from "./pages/Admin/sub-pages/AdminReports";
+import AdminProfile from "./pages/Admin/sub-pages/AdminProfile";
 import EverestTravelerDetails from "./pages/TravelerInfo";
 import OtpVerification from "./pages/OtpVerification";
 import GroupTrips from "./pages/GroupTrips";
+import GroupChat from "./pages/GroupChat";
 import BookGuide from "./pages/BookGuide";
 import GuideProfile from "./pages/GuideProfile";
 import GuideBooking from "./pages/GuideBooking";
@@ -30,19 +55,19 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/list-users" element={<ListUsers />} />
           <Route path="/user-form" element={<UserForm />} />
-
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
           <Route path="/destinations" element={<DestinationDetail />} />
           <Route path="/grouptrips" element={<GroupTrips />} />
+          <Route path="/groupchat" element={<GroupChat />} />
           <Route path="/guide" element={<BookGuide />} />
-          <Route path="/guide/:id/book" element={<GuideBooking />}>
+          <Route path="/guidebook/:id/" element={<GuideBooking />}>
             <Route index element={<TripDetailsStep />} />
             <Route path="your-info" element={<YourInfoStep />} />
             <Route path="payment" element={<PaymentStep />} />
           </Route>
-          <Route path="/guide/:id" element={<GuideProfile />} />
+          <Route path="/guideprofile/:id" element={<GuideProfile />} />
           <Route path="/tripdetail" element={<EverestBooking />} />
           <Route path="/travelerinfo" element={<EverestTravelerDetails />} />
           <Route path="/superadmin" element={<SuperAdminDashboard />}>
@@ -53,6 +78,35 @@ function App() {
               element={<AllAccountsPanel />}
             />
             <Route path="/superadmin/systemlog" element={<SystemLogsPanel />} />
+            <Route
+              path="/superadmin/platformsettings"
+              element={<PlatformSettings />}
+            />
+            <Route path="/superadmin/analytics" element={<Analytics />} />
+          </Route>
+          <Route path="/guidedashboard" element={<GuideDashboard />}>
+            <Route index element={<GuideOverview />} />
+            <Route path="trips" element={<MyTrips />} />
+            <Route path="requests" element={<GroupRequests />} />
+            <Route path="clients" element={<Clients />} />
+            <Route path="earnings" element={<Earnings />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="reviews" element={<Reviews />} />
+            <Route path="notifications" element={<GuideNotifications />} />
+            <Route path="profile" element={<GuideProfilePage />} />
+          </Route>
+          <Route path="/admin" element={<AdminDashboard />}>
+            <Route index element={<AdminOverview />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="guides" element={<AdminGuides />} />
+            <Route path="destinations" element={<AdminDestinations />} />
+            <Route path="trips" element={<AdminTrips />} />
+            <Route path="bookings" element={<AdminBookings />} />
+            <Route path="group-trips" element={<AdminGroupTrips />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="notifications" element={<AdminNotifications />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="profile" element={<AdminProfile />} />
           </Route>
         </Route>
 

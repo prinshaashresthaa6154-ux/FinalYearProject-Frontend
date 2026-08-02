@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Search, MapPin, Clock, Briefcase, Globe, Star } from "lucide-react";
 import { GUIDES } from "../data/guides";
+import { DASHBOARD_GUIDE_ID, getGuideAvatarUrl } from "../utils/guideAvatar";
+import { useGuideAvatarOptional } from "./Guide-Dashboard/GuideAvatarContext";
+import { useAdminPlatformOptional } from "../context/AdminPlatformContext";
 
 const FILTERS = [
   "All",
@@ -16,8 +19,15 @@ export default function BookGuide() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const avatarCtx = useGuideAvatarOptional();
+  const pembaAvatar = avatarCtx?.avatarUrl ?? getGuideAvatarUrl();
+  const adminPlatform = useAdminPlatformOptional();
 
   const filteredGuides = GUIDES.filter((guide) => {
+    const bookable = adminPlatform
+      ? adminPlatform.isGuideBookable(guide.id)
+      : true;
+    if (!bookable) return false;
     const matchesFilter =
       activeFilter === "All" || guide.category === activeFilter;
     const query = searchQuery.toLowerCase();
@@ -84,10 +94,18 @@ export default function BookGuide() {
                 {/* Card Header */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#A51C1C] flex items-center justify-center shrink-0">
-                      <span className="text-white text-xs font-semibold">
-                        {guide.initials}
-                      </span>
+                    <div className="w-10 h-10 rounded-full bg-[#A51C1C] overflow-hidden flex items-center justify-center shrink-0">
+                      {guide.id === DASHBOARD_GUIDE_ID && pembaAvatar ? (
+                        <img
+                          src={pembaAvatar}
+                          alt={guide.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white text-xs font-semibold">
+                          {guide.initials}
+                        </span>
+                      )}
                     </div>
                     <div className="min-w-0">
                       <h2 className="font-display font-bold text-[#1A1A1A] text-base leading-tight">
@@ -156,13 +174,13 @@ export default function BookGuide() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guideprofile/${guide.id}`)}
                       className="text-sm text-gray-600 hover:text-gray-800 font-medium whitespace-nowrap"
                     >
                       View Profile
                     </button>
                     <button
-                      onClick={() => navigate(`/guide/${guide.id}`)}
+                      onClick={() => navigate(`/guideprofile/${guide.id}`)}
                       className="bg-[#A51C1C] text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-[#8e1818] transition-colors whitespace-nowrap"
                     >
                       Book Guide
