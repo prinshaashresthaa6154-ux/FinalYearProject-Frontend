@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import { Search, MessageCircle, Mail } from "lucide-react";
-=======
-import { useState } from 'react';
-import { Search, MessageCircle, Mail } from 'lucide-react';
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
 const clients = [
   {
     id: 1,
-<<<<<<< HEAD
     initials: "SJ",
     name: "Sarah Johnson",
     country: "USA",
@@ -57,64 +51,11 @@ const clients = [
     lastTrip: "Manaslu Circuit",
     spent: "$4,100",
     status: "Active",
-=======
-    initials: 'SJ',
-    name: 'Sarah Johnson',
-    country: 'USA',
-    trips: 3,
-    lastTrip: 'Everest Base Camp',
-    spent: '$3,240',
-    status: 'Active',
-  },
-  {
-    id: 2,
-    initials: 'MT',
-    name: 'Mark Thompson',
-    country: 'UK',
-    trips: 1,
-    lastTrip: 'Annapurna Circuit',
-    spent: '$960',
-    status: 'Pending',
-  },
-  {
-    id: 3,
-    initials: 'YH',
-    name: 'Yuki Harada',
-    country: 'Japan',
-    trips: 2,
-    lastTrip: 'Langtang Valley',
-    spent: '$1,420',
-    status: 'Active',
-  },
-  {
-    id: 4,
-    initials: 'EC',
-    name: 'Emily Chen',
-    country: 'Singapore',
-    trips: 1,
-    lastTrip: 'EBC Group Trek',
-    spent: '$890',
-    status: 'Active',
-  },
-  {
-    id: 5,
-    initials: 'JW',
-    name: 'James Wilson',
-    country: 'Australia',
-    trips: 4,
-    lastTrip: 'Manaslu Circuit',
-    spent: '$4,100',
-    status: 'Active',
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
 export default function Clients() {
-<<<<<<< HEAD
   const [query, setQuery] = useState("");
-=======
-  const [query, setQuery] = useState('');
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
   const filtered = clients.filter(
     (c) =>
@@ -160,14 +101,10 @@ export default function Clients() {
           </thead>
           <tbody className="divide-y divide-[#f5efe9]">
             {filtered.map((client) => (
-<<<<<<< HEAD
               <tr
                 key={client.id}
                 className="hover:bg-[#fdfcfb] transition-colors"
               >
-=======
-              <tr key={client.id} className="hover:bg-[#fdfcfb] transition-colors">
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[#1e2a44] text-white flex items-center justify-center text-xs font-semibold">
@@ -178,7 +115,6 @@ export default function Clients() {
                     </span>
                   </div>
                 </td>
-<<<<<<< HEAD
                 <td className="py-4 px-6 text-sm text-gray-500">
                   {client.country}
                 </td>
@@ -188,26 +124,15 @@ export default function Clients() {
                 <td className="py-4 px-6 text-sm text-gray-500">
                   {client.lastTrip}
                 </td>
-=======
-                <td className="py-4 px-6 text-sm text-gray-500">{client.country}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{client.trips}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{client.lastTrip}</td>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                 <td className="py-4 px-6 text-sm font-semibold text-[#1a130e]">
                   {client.spent}
                 </td>
                 <td className="py-4 px-6">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-<<<<<<< HEAD
                       client.status === "Active"
                         ? "bg-[#b31919] text-white"
                         : "bg-[#1e2a44] text-white"
-=======
-                      client.status === 'Active'
-                        ? 'bg-[#b31919] text-white'
-                        : 'bg-[#1e2a44] text-white'
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                     }`}
                   >
                     {client.status}

@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
 type TripStatus = "Confirmed" | "Pending" | "Completed" | "Cancelled";
-=======
-import { useState } from 'react';
-import { Pencil, Trash2, Plus } from 'lucide-react';
-
-type TripStatus = 'Confirmed' | 'Pending' | 'Completed' | 'Cancelled';
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
 interface Trip {
   id: number;
@@ -23,7 +16,6 @@ interface Trip {
 const initialTrips: Trip[] = [
   {
     id: 1,
-<<<<<<< HEAD
     tourist: "Sarah Johnson",
     package: "Everest Base Camp Trek",
     startDate: "2026-04-05",
@@ -57,56 +49,14 @@ const initialTrips: Trip[] = [
     duration: "16 days",
     earnings: "$1,280",
     status: "Completed",
-=======
-    tourist: 'Sarah Johnson',
-    package: 'Everest Base Camp Trek',
-    startDate: '2026-04-05',
-    duration: '14 days',
-    earnings: '$1,120',
-    status: 'Confirmed',
-  },
-  {
-    id: 2,
-    tourist: 'Mark Thompson',
-    package: 'Annapurna Circuit',
-    startDate: '2026-04-20',
-    duration: '12 days',
-    earnings: '$960',
-    status: 'Pending',
-  },
-  {
-    id: 3,
-    tourist: 'Yuki Harada',
-    package: 'Langtang Valley Trek',
-    startDate: '2026-05-01',
-    duration: '7 days',
-    earnings: '$560',
-    status: 'Confirmed',
-  },
-  {
-    id: 4,
-    tourist: 'James Wilson',
-    package: 'Manaslu Circuit',
-    startDate: '2026-03-10',
-    duration: '16 days',
-    earnings: '$1,280',
-    status: 'Completed',
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
 const statusStyle: Record<TripStatus, string> = {
-<<<<<<< HEAD
   Confirmed: "bg-[#b31919] text-white",
   Pending: "bg-[#1e2a44] text-white",
   Completed: "bg-emerald-700 text-white",
   Cancelled: "bg-gray-400 text-white",
-=======
-  Confirmed: 'bg-[#b31919] text-white',
-  Pending: 'bg-[#1e2a44] text-white',
-  Completed: 'bg-emerald-700 text-white',
-  Cancelled: 'bg-gray-400 text-white',
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 };
 
 export default function MyTrips() {
@@ -115,11 +65,7 @@ export default function MyTrips() {
   const acceptTrip = (id: number) => {
     setTrips((prev) =>
       prev.map((trip) =>
-<<<<<<< HEAD
         trip.id === id ? { ...trip, status: "Confirmed" } : trip,
-=======
-        trip.id === id ? { ...trip, status: 'Confirmed' } : trip,
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
       ),
     );
   };
@@ -127,11 +73,7 @@ export default function MyTrips() {
   const declineTrip = (id: number) => {
     setTrips((prev) =>
       prev.map((trip) =>
-<<<<<<< HEAD
         trip.id === id ? { ...trip, status: "Cancelled" } : trip,
-=======
-        trip.id === id ? { ...trip, status: 'Cancelled' } : trip,
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
       ),
     );
   };
@@ -175,7 +117,6 @@ export default function MyTrips() {
           </thead>
           <tbody className="divide-y divide-[#f5efe9]">
             {trips.map((trip) => (
-<<<<<<< HEAD
               <tr
                 key={trip.id}
                 className="hover:bg-[#fdfcfb] transition-colors"
@@ -192,15 +133,6 @@ export default function MyTrips() {
                 <td className="py-4 px-6 text-sm text-gray-500">
                   {trip.duration}
                 </td>
-=======
-              <tr key={trip.id} className="hover:bg-[#fdfcfb] transition-colors">
-                <td className="py-4 px-6 text-sm font-semibold text-[#2c2520]">
-                  {trip.tourist}
-                </td>
-                <td className="py-4 px-6 text-sm text-gray-500">{trip.package}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{trip.startDate}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{trip.duration}</td>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                 <td className="py-4 px-6 text-sm font-semibold text-[#1a130e]">
                   {trip.earnings}
                 </td>
@@ -211,11 +143,7 @@ export default function MyTrips() {
                     >
                       {trip.status}
                     </span>
-<<<<<<< HEAD
                     {trip.status === "Pending" && (
-=======
-                    {trip.status === 'Pending' && (
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                       <div className="flex items-center gap-2">
                         <button
                           type="button"

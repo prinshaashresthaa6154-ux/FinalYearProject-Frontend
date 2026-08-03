@@ -11,15 +11,9 @@ import {
   Star,
   User,
   Search,
-<<<<<<< HEAD
 } from "lucide-react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { useGuideAvatar } from "./GuideAvatarContext";
-=======
-} from 'lucide-react';
-import { Outlet, useLocation, useNavigate } from 'react-router';
-import { useGuideAvatar } from './GuideAvatarContext';
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
 function GuideDashboardShell() {
   const navigate = useNavigate();
@@ -27,7 +21,6 @@ function GuideDashboardShell() {
   const { avatarUrl } = useGuideAvatar();
 
   const tabs = [
-<<<<<<< HEAD
     { id: 1, name: "Overview", icon: LayoutDashboard, path: "/guidedashboard" },
     { id: 2, name: "My Trips", icon: Map, path: "/guidedashboard/trips" },
     {
@@ -57,32 +50,14 @@ function GuideDashboardShell() {
       path: "/guidedashboard/notifications",
     },
     { id: 9, name: "Profile", icon: User, path: "/guidedashboard/profile" },
-=======
-    { id: 1, name: 'Overview', icon: LayoutDashboard, path: '/guidedashboard' },
-    { id: 2, name: 'My Trips', icon: Map, path: '/guidedashboard/trips' },
-    { id: 3, name: 'Group Requests', icon: Users, path: '/guidedashboard/requests' },
-    { id: 4, name: 'Clients', icon: UserRound, path: '/guidedashboard/clients' },
-    { id: 5, name: 'Earnings', icon: Wallet, path: '/guidedashboard/earnings' },
-    { id: 6, name: 'Messages', icon: MessageSquare, path: '/guidedashboard/messages' },
-    { id: 7, name: 'Reviews', icon: Star, path: '/guidedashboard/reviews' },
-    { id: 8, name: 'Notifications', icon: Bell, path: '/guidedashboard/notifications' },
-    { id: 9, name: 'Profile', icon: User, path: '/guidedashboard/profile' },
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   ];
 
   const activeTab =
     tabs.find((tab) =>
-<<<<<<< HEAD
       tab.path === "/guidedashboard"
         ? location.pathname === "/guidedashboard"
         : location.pathname.startsWith(tab.path),
     )?.name ?? "Overview";
-=======
-      tab.path === '/guidedashboard'
-        ? location.pathname === '/guidedashboard'
-        : location.pathname.startsWith(tab.path),
-    )?.name ?? 'Overview';
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
   return (
     <div className="min-h-screen bg-[#fdfbf9] text-[#2c2520] font-sans antialiased">
@@ -104,11 +79,7 @@ function GuideDashboardShell() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-<<<<<<< HEAD
                 "PS"
-=======
-                'PS'
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
               )}
             </div>
             <div>
@@ -130,11 +101,7 @@ function GuideDashboardShell() {
             </div>
             <button
               type="button"
-<<<<<<< HEAD
               onClick={() => navigate("/guidedashboard/notifications")}
-=======
-              onClick={() => navigate('/guidedashboard/notifications')}
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
               className="relative text-gray-500 hover:text-[#2c2520] p-1.5 transition"
             >
               <Bell className="w-5 h-5" />
@@ -142,11 +109,7 @@ function GuideDashboardShell() {
             </button>
             <button
               type="button"
-<<<<<<< HEAD
               onClick={() => navigate("/guidedashboard/profile")}
-=======
-              onClick={() => navigate('/guidedashboard/profile')}
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
               className="text-gray-500 hover:text-[#2c2520] p-1.5 transition"
             >
               <Settings className="w-5 h-5" />
@@ -168,13 +131,8 @@ function GuideDashboardShell() {
                   onClick={() => navigate(tab.path)}
                   className={`flex items-center gap-2 px-4 py-2.5 text-[14px] font-medium transition-all duration-200 rounded-xl ${
                     isActive
-<<<<<<< HEAD
                       ? "bg-[#b31919] text-white shadow-sm"
                       : "text-[#6e5e54] hover:text-[#b31919] hover:bg-[#efece9]"
-=======
-                      ? 'bg-[#b31919] text-white shadow-sm'
-                      : 'text-[#6e5e54] hover:text-[#b31919] hover:bg-[#efece9]'
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                   }`}
                 >
                   <Icon className="w-4 h-4" />

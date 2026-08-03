@@ -10,14 +10,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { getGuideById } from "../data/guides";
-<<<<<<< HEAD
 import { DASHBOARD_GUIDE_ID, getGuideAvatarUrl } from "../utils/guideAvatar";
-=======
-import {
-  DASHBOARD_GUIDE_ID,
-  getGuideAvatarUrl,
-} from "../utils/guideAvatar";
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 import { useGuideAvatarOptional } from "./Guide-Dashboard/GuideAvatarContext";
 
 function StarRating({ rating }: { rating: number }) {
@@ -44,11 +37,7 @@ export default function GuideProfile() {
   const avatarCtx = useGuideAvatarOptional();
   const avatarUrl =
     guide?.id === DASHBOARD_GUIDE_ID
-<<<<<<< HEAD
       ? (avatarCtx?.avatarUrl ?? getGuideAvatarUrl())
-=======
-      ? avatarCtx?.avatarUrl ?? getGuideAvatarUrl()
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
       : null;
 
   if (!guide) {

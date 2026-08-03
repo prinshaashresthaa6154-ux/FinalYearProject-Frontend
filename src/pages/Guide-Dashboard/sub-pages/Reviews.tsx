@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 import { Star } from "lucide-react";
 
 const summary = {
   rating: "4.9",
-=======
-import { Star } from 'lucide-react';
-
-const summary = {
-  rating: '4.9',
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   total: 245,
   breakdown: [
     { stars: 5, percent: 82 },
@@ -22,7 +15,6 @@ const summary = {
 const reviews = [
   {
     id: 1,
-<<<<<<< HEAD
     initials: "SJ",
     name: "Sarah Johnson",
     trip: "Everest Base Camp Trek",
@@ -56,41 +48,6 @@ const reviews = [
     rating: 5,
     date: "Dec 20, 2025",
     text: "Warm, reliable, and always looking after the group. Would book again.",
-=======
-    initials: 'SJ',
-    name: 'Sarah Johnson',
-    trip: 'Everest Base Camp Trek',
-    rating: 5,
-    date: 'Mar 18, 2026',
-    text: 'Pemba was an outstanding guide. Safety-focused, knowledgeable, and made the whole trek memorable.',
-  },
-  {
-    id: 2,
-    initials: 'YH',
-    name: 'Yuki Harada',
-    trip: 'Langtang Valley Trek',
-    rating: 5,
-    date: 'Feb 28, 2026',
-    text: 'Excellent pacing and great local insights. Highly recommend for first-time trekkers.',
-  },
-  {
-    id: 3,
-    initials: 'JW',
-    name: 'James Wilson',
-    trip: 'Manaslu Circuit',
-    rating: 4,
-    date: 'Jan 12, 2026',
-    text: 'Professional throughout. Weather was tough but Pemba handled logistics perfectly.',
-  },
-  {
-    id: 4,
-    initials: 'EC',
-    name: 'Emily Chen',
-    trip: 'Annapurna Circuit',
-    rating: 5,
-    date: 'Dec 20, 2025',
-    text: 'Warm, reliable, and always looking after the group. Would book again.',
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
@@ -101,11 +58,7 @@ function Stars({ count }: { count: number }) {
         <Star
           key={i}
           className={`w-3.5 h-3.5 ${
-<<<<<<< HEAD
             i < count ? "fill-amber-400 text-amber-400" : "text-gray-300"
-=======
-            i < count ? 'fill-amber-400 text-amber-400' : 'text-gray-300'
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
           }`}
         />
       ))}
@@ -128,13 +81,9 @@ export default function Reviews() {
             <div className="flex justify-center mt-1">
               <Stars count={5} />
             </div>
-<<<<<<< HEAD
             <p className="text-xs text-gray-400 mt-1">
               {summary.total} reviews
             </p>
-=======
-            <p className="text-xs text-gray-400 mt-1">{summary.total} reviews</p>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
           </div>
           <div className="space-y-2">
             {summary.breakdown.map((row) => (
@@ -146,13 +95,9 @@ export default function Reviews() {
                     style={{ width: `${row.percent}%` }}
                   />
                 </div>
-<<<<<<< HEAD
                 <span className="w-8 text-right text-gray-400">
                   {row.percent}%
                 </span>
-=======
-                <span className="w-8 text-right text-gray-400">{row.percent}%</span>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
               </div>
             ))}
           </div>
@@ -176,13 +121,9 @@ export default function Reviews() {
                       <p className="text-sm font-semibold text-[#1a130e]">
                         {review.name}
                       </p>
-<<<<<<< HEAD
                       <p className="text-xs text-gray-400 mt-0.5">
                         {review.trip}
                       </p>
-=======
-                      <p className="text-xs text-gray-400 mt-0.5">{review.trip}</p>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                       <div className="mt-1.5">
                         <Stars count={review.rating} />
                       </div>
@@ -191,13 +132,9 @@ export default function Reviews() {
                       </p>
                     </div>
                   </div>
-<<<<<<< HEAD
                   <span className="text-xs text-gray-400 shrink-0">
                     {review.date}
                   </span>
-=======
-                  <span className="text-xs text-gray-400 shrink-0">{review.date}</span>
->>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                 </div>
               </div>
             ))}
