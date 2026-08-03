@@ -7,6 +7,7 @@ import {
   Check,
   MessageCircle,
   X,
+<<<<<<< HEAD
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -38,12 +39,46 @@ const stats = [
     icon: CreditCard,
     iconColor: "text-emerald-600",
     bgIcon: "bg-emerald-50",
+=======
+} from 'lucide-react';
+import { useNavigate } from 'react-router';
+
+const stats = [
+  {
+    label: 'Total Trips',
+    value: '380',
+    icon: Mountain,
+    iconColor: 'text-rose-500',
+    bgIcon: 'bg-rose-50',
+  },
+  {
+    label: 'Rating',
+    value: '4.9',
+    icon: Star,
+    iconColor: 'text-amber-500',
+    bgIcon: 'bg-amber-50',
+  },
+  {
+    label: 'Reviews',
+    value: '245',
+    icon: MessageSquare,
+    iconColor: 'text-blue-500',
+    bgIcon: 'bg-blue-50',
+  },
+  {
+    label: 'Total Earnings',
+    value: '$28,400',
+    icon: CreditCard,
+    iconColor: 'text-emerald-600',
+    bgIcon: 'bg-emerald-50',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
 const upcomingTrips = [
   {
     id: 1,
+<<<<<<< HEAD
     name: "Annapurna Circuit",
     tourist: "Sarah Johnson",
     duration: "12 days",
@@ -59,12 +94,30 @@ const upcomingTrips = [
     date: "2026-05-05",
     status: "Confirmed",
     price: "$1,120",
+=======
+    name: 'Annapurna Circuit',
+    tourist: 'Sarah Johnson',
+    duration: '12 days',
+    date: '2026-04-20',
+    status: 'Confirmed',
+    price: '$960',
+  },
+  {
+    id: 2,
+    name: 'Everest Base Camp',
+    tourist: 'James Wilson',
+    duration: '14 days',
+    date: '2026-05-05',
+    status: 'Confirmed',
+    price: '$1,120',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
 const joinRequests = [
   {
     id: 1,
+<<<<<<< HEAD
     initials: "EC",
     name: "Emily Chen",
     paid: true,
@@ -80,6 +133,23 @@ const joinRequests = [
     location: "South Korea",
     date: "Mar 22, 2026",
     trip: "Everest Base Camp Group Trek",
+=======
+    initials: 'EC',
+    name: 'Emily Chen',
+    paid: true,
+    location: 'Singapore',
+    date: 'Mar 22, 2026',
+    trip: 'Everest Base Camp Group Trek',
+  },
+  {
+    id: 2,
+    initials: 'DK',
+    name: 'David Kim',
+    paid: true,
+    location: 'South Korea',
+    date: 'Mar 22, 2026',
+    trip: 'Everest Base Camp Group Trek',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
   },
 ];
 
@@ -121,7 +191,11 @@ export default function GuideOverview() {
           </h2>
           <button
             type="button"
+<<<<<<< HEAD
             onClick={() => navigate("/guidedashboard/trips")}
+=======
+            onClick={() => navigate('/guidedashboard/trips')}
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
             className="text-sm font-medium text-[#b31919] hover:underline"
           >
             View All
@@ -173,7 +247,11 @@ export default function GuideOverview() {
           </div>
           <button
             type="button"
+<<<<<<< HEAD
             onClick={() => navigate("/guidedashboard/requests")}
+=======
+            onClick={() => navigate('/guidedashboard/requests')}
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
             className="text-sm font-medium text-[#b31919] hover:underline shrink-0"
           >
             View All

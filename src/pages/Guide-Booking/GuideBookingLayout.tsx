@@ -7,8 +7,8 @@ import {
   useParams,
 } from "react-router";
 import { getGuideById } from "../../data/guides";
-import { GuideBookingProvider } from "./GuideBookingContext";
 import BookingStepper from "./BookingStepper";
+import { GuideBookingProvider } from "./GuideBookingContext";
 
 function GuideBookingLayoutContent() {
   const { id } = useParams();

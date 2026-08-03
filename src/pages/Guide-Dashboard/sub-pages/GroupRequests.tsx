@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import { Check, MessageCircle, X } from "lucide-react";
+=======
+import { useState } from 'react';
+import { Check, MessageCircle, X } from 'lucide-react';
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
 interface JoinRequest {
   id: number;
@@ -15,42 +20,78 @@ interface JoinRequest {
 const initialRequests: JoinRequest[] = [
   {
     id: 1,
+<<<<<<< HEAD
     initials: "EC",
     name: "Emily Chen",
     paid: true,
     location: "Singapore",
     date: "Mar 22, 2026",
     trip: "Everest Base Camp Group Trek",
+=======
+    initials: 'EC',
+    name: 'Emily Chen',
+    paid: true,
+    location: 'Singapore',
+    date: 'Mar 22, 2026',
+    trip: 'Everest Base Camp Group Trek',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
     spots: 1,
   },
   {
     id: 2,
+<<<<<<< HEAD
     initials: "DK",
     name: "David Kim",
     paid: true,
     location: "South Korea",
     date: "Mar 22, 2026",
     trip: "Everest Base Camp Group Trek",
+=======
+    initials: 'DK',
+    name: 'David Kim',
+    paid: true,
+    location: 'South Korea',
+    date: 'Mar 22, 2026',
+    trip: 'Everest Base Camp Group Trek',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
     spots: 1,
   },
   {
     id: 3,
+<<<<<<< HEAD
     initials: "AM",
     name: "Anna Müller",
     paid: false,
     location: "Germany",
     date: "Apr 02, 2026",
     trip: "Annapurna Base Camp Group",
+=======
+    initials: 'AM',
+    name: 'Anna Müller',
+    paid: false,
+    location: 'Germany',
+    date: 'Apr 02, 2026',
+    trip: 'Annapurna Base Camp Group',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
     spots: 2,
   },
   {
     id: 4,
+<<<<<<< HEAD
     initials: "RL",
     name: "Ryan Lopez",
     paid: true,
     location: "USA",
     date: "Apr 10, 2026",
     trip: "Langtang Valley Group Trek",
+=======
+    initials: 'RL',
+    name: 'Ryan Lopez',
+    paid: true,
+    location: 'USA',
+    date: 'Apr 10, 2026',
+    trip: 'Langtang Valley Group Trek',
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
     spots: 1,
   },
 ];
@@ -70,8 +111,12 @@ export default function GroupRequests() {
             Group Trip Join Requests
           </h2>
           <p className="text-sm text-gray-400 mt-0.5">
+<<<<<<< HEAD
             Approve to add tourists to the group chat · {requests.length}{" "}
             pending
+=======
+            Approve to add tourists to the group chat · {requests.length} pending
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
           </p>
         </div>
       </div>
@@ -93,9 +138,13 @@ export default function GroupRequests() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
+<<<<<<< HEAD
                     <span className="font-semibold text-[#1a130e]">
                       {req.name}
                     </span>
+=======
+                    <span className="font-semibold text-[#1a130e]">{req.name}</span>
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                     {req.paid ? (
                       <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-[#b31919] text-white">
                         Paid
@@ -106,15 +155,23 @@ export default function GroupRequests() {
                       </span>
                     )}
                     <span className="text-xs text-gray-400">
+<<<<<<< HEAD
                       {req.spots} spot{req.spots > 1 ? "s" : ""}
+=======
+                      {req.spots} spot{req.spots > 1 ? 's' : ''}
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                     </span>
                   </div>
                   <p className="text-sm text-gray-400 mt-0.5">
                     {req.location} · {req.date}
                   </p>
+<<<<<<< HEAD
                   <p className="text-sm text-[#2c2520] mt-1">
                     Trip: {req.trip}
                   </p>
+=======
+                  <p className="text-sm text-[#2c2520] mt-1">Trip: {req.trip}</p>
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
                 </div>
               </div>
 

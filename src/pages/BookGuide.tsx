@@ -4,7 +4,10 @@ import { Search, MapPin, Clock, Briefcase, Globe, Star } from "lucide-react";
 import { GUIDES } from "../data/guides";
 import { DASHBOARD_GUIDE_ID, getGuideAvatarUrl } from "../utils/guideAvatar";
 import { useGuideAvatarOptional } from "./Guide-Dashboard/GuideAvatarContext";
+<<<<<<< HEAD
 import { useAdminPlatformOptional } from "../context/AdminPlatformContext";
+=======
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
 const FILTERS = [
   "All",
@@ -21,7 +24,10 @@ export default function BookGuide() {
   const [searchQuery, setSearchQuery] = useState("");
   const avatarCtx = useGuideAvatarOptional();
   const pembaAvatar = avatarCtx?.avatarUrl ?? getGuideAvatarUrl();
+<<<<<<< HEAD
   const adminPlatform = useAdminPlatformOptional();
+=======
+>>>>>>> e43b886b4ee54d59044348a1a82e3a98435d9cbb
 
   const filteredGuides = GUIDES.filter((guide) => {
     const bookable = adminPlatform

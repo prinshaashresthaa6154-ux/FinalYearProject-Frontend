@@ -43,11 +43,11 @@ export default function PaymentStep() {
 
   useEffect(() => {
     if (!tripDetails.startDate || !tripDetails.destination) {
-      navigate(`/guide/${id}/book`, { replace: true });
+      navigate(`/guidebook/${id}`, { replace: true });
       return;
     }
     if (!yourInfo.fullName || !yourInfo.email || !yourInfo.phone) {
-      navigate(`/guide/${id}/book/your-info`, { replace: true });
+      navigate(`/guidebook/${id}your-info`, { replace: true });
     }
   }, [tripDetails, yourInfo, id, navigate]);
 
@@ -61,7 +61,7 @@ export default function PaymentStep() {
   };
 
   const handleBack = () => {
-    navigate(`/guide/${guide.id}/book/your-info`);
+    navigate(`/guidebook/${guide.id}/your-info`);
   };
 
   return (

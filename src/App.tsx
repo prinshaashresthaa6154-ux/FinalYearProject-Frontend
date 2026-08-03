@@ -43,9 +43,9 @@ import GroupChat from "./pages/GroupChat";
 import BookGuide from "./pages/BookGuide";
 import GuideProfile from "./pages/GuideProfile";
 import GuideBooking from "./pages/GuideBooking";
-import TripDetailsStep from "./pages/Guide-Booking/TripDetailsStep";
-import YourInfoStep from "./pages/Guide-Booking/YourInfoStep";
-import PaymentStep from "./pages/Guide-Booking/PaymentStep";
+import TripDetailsStep from "./pages/guide-booking/TripDetailsStep";
+import YourInfoStep from "./pages/guide-booking/YourInfoStep";
+import PaymentStep from "./pages/guide-booking/PaymentStep";
 
 function App() {
   return (
