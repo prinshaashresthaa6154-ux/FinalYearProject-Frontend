@@ -14,4 +14,3 @@ export const updateUsers= (id, user) => axios.put(url + "/" + id, user);
 export const deleteusers= (id) => axios.get(url + "/" + id);
 
 
-
