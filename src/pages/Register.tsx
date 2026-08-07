@@ -75,7 +75,7 @@ export default function Register() {
         payload,
       );
 
-      if (response.status !== 201 || !response.data.success) {
+      if (!response.data.success) {
         setErrorMessage(response.data.message || "Registration failed");
         return;
       }

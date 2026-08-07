@@ -8,6 +8,7 @@ import {
   Mountain,
   Compass,
 } from "lucide-react";
+import { Link } from "react-router";
 
 import hero from "../assets/Herosection.jpg";
 import everest from "../assets/Everest-base.jpeg";
@@ -202,10 +203,13 @@ const Home = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition">
+              <Link
+                to="/destinations"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg flex items-center gap-2 transition"
+              >
                 Explore Destinations
                 <ArrowRight className="h-5 w-5" />
-              </button>
+              </Link>
 
               <button className="border border-white text-white hover:bg-white hover:text-black px-8 py-3 rounded-lg transition">
                 View Packages
@@ -302,33 +306,30 @@ const Home = () => {
         {/* Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-9 max-w-6xl w-full">
           {destinations.map((destination) => (
-            <div
+            <Link
               key={destination.id}
+              to={`/destinations/${destination.id}`}
               className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 flex flex-col cursor-pointer"
             >
-              {/* Card Image Area */}
               <div className="w-full h-56 overflow-hidden relative">
                 <img
                   src={destination.image}
                   alt={destination.title}
                   className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
                 />
-                {/* Elegant overlay panel that reveals smoothly on container hover */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button className="bg-white text-gray-900 font-medium px-5 py-2.5 rounded-full shadow-md transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 ease-out text-sm tracking-wide hover:bg-[#A84430] hover:text-white">
+                  <span className="bg-white text-gray-900 font-medium px-5 py-2.5 rounded-full shadow-md transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 ease-out text-sm tracking-wide group-hover:bg-[#A84430] group-hover:text-white">
                     Explore Details
-                  </button>
+                  </span>
                 </div>
               </div>
 
-              {/* Card Content Area */}
               <div className="p-6 flex flex-col flex-grow">
                 <h2 className="text-xl font-bold text-[#1A1A1A] mb-2 font-serif group-hover:text-[#A84430] transition-colors duration-200">
                   {destination.title}
                 </h2>
 
                 <div className="flex items-center gap-1 mb-4">
-                  {/* SVG Pin Icon */}
                   <svg
                     className="w-3.5 h-3.5 text-gray-400 flex-shrink-0"
                     viewBox="0 0 24 24"
@@ -348,7 +349,6 @@ const Home = () => {
                   {destination.description}
                 </p>
 
-                {/* Card Footer Section */}
                 <div className="flex justify-between items-center border-t border-gray-100 pt-4 mt-auto">
                   <span className="text-xs md:text-sm text-gray-400">
                     {destination.season}
@@ -363,7 +363,7 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -62,10 +62,11 @@ const refreshClient = axios.create({
 
 let refreshRequest: Promise<string> | null = null;
 
-const clearSession = () => {
+export const clearAuthSession = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+  window.dispatchEvent(new Event(AUTH_SESSION_UPDATED_EVENT));
 };
 
 export const setAuthSession = (
@@ -139,11 +140,11 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch {
-        clearSession();
+        clearAuthSession();
         window.location.href = "/login";
       }
     } else if (error.response?.status === 401 && !isPublicAuthRequest) {
-      clearSession();
+      clearAuthSession();
 
       window.location.href = "/login";
     }

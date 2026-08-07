@@ -4,7 +4,7 @@ import { flushSync } from "react-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import api from "../api/axios";
+import api, { clearAuthSession } from "../api/axios";
 
 type LoginForm = {
   email: string;
@@ -88,7 +88,12 @@ const Login = () => {
         ? error.response?.data?.message
         : undefined;
 
-      if (message?.toLowerCase().includes("email is not verified")) {
+      const normalizedMessage = message?.toLowerCase();
+      const requiresVerification =
+        normalizedMessage?.includes("not verified") ||
+        normalizedMessage?.includes("unverified");
+
+      if (requiresVerification) {
         navigate("/otp", {
           state: {
             email: form.email.trim(),
@@ -96,6 +101,10 @@ const Login = () => {
           },
         });
         return;
+      }
+
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        clearAuthSession();
       }
 
       setErrorMessage(message || "Unable to sign in. Please try again.");

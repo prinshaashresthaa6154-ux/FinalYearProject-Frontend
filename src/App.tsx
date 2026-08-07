@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
-import DestinationDetail from "./pages/Destination";
+import Destinations from "./pages/Destinations";
 import EverestBooking from "./pages/TripDetails";
 import OAuthSuccess from "./pages/0AuthSuccess";
 import SuperAdminDashboard from "./pages/Super-Admin/SuperAdmin";
@@ -48,6 +48,7 @@ import GuideBooking from "./pages/GuideBooking";
 import TripDetailsStep from "./pages/Guide-Booking/TripDetailsStep";
 import YourInfoStep from "./pages/Guide-Booking/YourInfoStep";
 import PaymentStep from "./pages/Guide-Booking/PaymentStep";
+import DestinationDetail from "./pages/Destination";
 
 function App() {
   return (
@@ -62,7 +63,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
-          <Route path="/destinations" element={<DestinationDetail />} />
+          <Route path="/destinations" element={<Destinations />} />
+          <Route path="/destinations/:id" element={<DestinationDetail />} />
           <Route path="/grouptrips" element={<GroupTrips />} />
           <Route path="/groupchat" element={<GroupChat />} />
           <Route path="/guide" element={<BookGuide />} />
