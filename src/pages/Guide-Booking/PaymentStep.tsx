@@ -1,10 +1,37 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import axios from "axios";
 import { Shield } from "lucide-react";
+import api from "../../api/axios";
 import { getGuideById } from "../../data/guides";
 import { useGuideBooking } from "./GuideBookingContext";
 import BookingSummary from "./BookingSummary";
 import { getDurationDays, type PaymentMethod } from "./types";
+
+type CreateBookingResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    bookingId: number;
+  };
+};
+
+type TravelPackage = {
+  id: number;
+};
+
+type TravelPackageListResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    content: TravelPackage[];
+  };
+};
+
+type BookingErrorResponse = {
+  message?: string;
+  data?: Record<string, string> | string[] | null;
+};
 
 const PAYMENT_OPTIONS: {
   id: PaymentMethod;
@@ -37,27 +64,103 @@ export default function PaymentStep() {
   const { id } = useParams();
   const navigate = useNavigate();
   const guide = getGuideById(Number(id));
-  const { tripDetails, yourInfo } = useGuideBooking();
+  const { tripDetails } = useGuideBooking();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("esewa");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [bookingId, setBookingId] = useState<number | null>(null);
+  const [packageId, setPackageId] = useState<number | null>(null);
+  const [isLoadingPackage, setIsLoadingPackage] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPackage = async () => {
+      if (!guide) {
+        setIsLoadingPackage(false);
+        return;
+      }
+
+      try {
+        const response = await api.get<TravelPackageListResponse>(
+          "/api/travel-packages",
+          { params: { guideId: guide.id, size: 1 } },
+        );
+
+        if (isMounted) {
+          setPackageId(response.data.data.content[0]?.id ?? null);
+        }
+      } catch {
+        if (isMounted) {
+          setErrorMessage("Unable to load this guide's travel package.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingPackage(false);
+        }
+      }
+    };
+
+    void loadPackage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [guide]);
 
   useEffect(() => {
     if (!tripDetails.startDate || !tripDetails.destination) {
       navigate(`/guidebook/${id}`, { replace: true });
       return;
     }
-    if (!yourInfo.fullName || !yourInfo.email || !yourInfo.phone) {
-      navigate(`/guidebook/${id}your-info`, { replace: true });
-    }
-  }, [tripDetails, yourInfo, id, navigate]);
+  }, [tripDetails, id, navigate]);
 
   if (!guide) return null;
 
   const duration = getDurationDays(tripDetails.startDate, tripDetails.endDate);
   const total = guide.price * duration;
 
-  const handleConfirm = (e: React.FormEvent) => {
+  const handleConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting || bookingId !== null) return;
+
+    setErrorMessage("");
+    setIsSubmitting(true);
+
+    try {
+      if (packageId === null) {
+        setErrorMessage("No travel package is available for this guide.");
+        return;
+      }
+
+      const response = await api.post<CreateBookingResponse>("/api/bookings", {
+        packageId,
+        numberOfPeople: tripDetails.travelers,
+      });
+
+      if (!response.data.success) {
+        setErrorMessage(response.data.message || "Unable to create booking.");
+        return;
+      }
+
+      setBookingId(response.data.data.bookingId);
+    } catch (error) {
+      const errorData = axios.isAxiosError<BookingErrorResponse>(error)
+        ? error.response?.data
+        : undefined;
+      const validationErrors = errorData?.data
+        ? Object.values(errorData.data).join(" ")
+        : "";
+
+      setErrorMessage(
+        validationErrors ||
+          errorData?.message ||
+          "Unable to create booking. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -105,6 +208,24 @@ export default function PaymentStep() {
             Your payment information is secured with 256-bit encryption
           </div>
 
+          {errorMessage && (
+            <p role="alert" className="text-sm text-red-600">
+              {errorMessage}
+            </p>
+          )}
+
+          {bookingId !== null && (
+            <p role="status" className="text-sm text-green-700">
+              Booking #{bookingId} was created successfully.
+            </p>
+          )}
+
+          {!isLoadingPackage && packageId === null && !errorMessage && (
+            <p role="alert" className="text-sm text-red-600">
+              No travel package is available for this guide.
+            </p>
+          )}
+
           <div className="flex items-center gap-4 pt-4">
             <button
               type="button"
@@ -115,9 +236,19 @@ export default function PaymentStep() {
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#A51C1C] text-white font-semibold py-3.5 rounded-lg hover:bg-[#8e1818] transition-colors"
+              disabled={
+                isLoadingPackage ||
+                packageId === null ||
+                isSubmitting ||
+                bookingId !== null
+              }
+              className="flex-1 bg-[#A51C1C] text-white font-semibold py-3.5 rounded-lg hover:bg-[#8e1818] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Confirm & Pay ${total}
+              {isSubmitting
+                ? "Creating booking..."
+                : bookingId !== null
+                  ? "Booking Confirmed"
+                  : `Confirm Booking $${total}`}
             </button>
           </div>
         </form>

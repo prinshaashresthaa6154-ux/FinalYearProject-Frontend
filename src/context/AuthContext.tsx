@@ -5,6 +5,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import {
+  AUTH_SESSION_UPDATED_EVENT,
+  setAuthSession,
+} from "../api/axios";
 
 type User = {
   id: number;
@@ -17,7 +21,7 @@ type AuthContextType = {
   token: string | null;
   userDTO: User | null;
   isAuthenticated: boolean;
-  login: (jwtToken: string, userData: User) => void;
+  login: (jwtToken: string, userData: User, refreshToken?: string) => void;
   logout: () => void;
 };
 
@@ -28,31 +32,8 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const isTokenExpired = (token: string): boolean => {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-
-      return payload.exp * 1000 < Date.now();
-    } catch {
-      return true;
-    }
-  };
-
   const [token, setToken] = useState<string | null>(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (!storedToken) {
-      return null;
-    }
-
-    if (isTokenExpired(storedToken)) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
-      return null;
-    }
-
-    return storedToken;
+    return localStorage.getItem("token");
   });
 
   const [user, setUser] = useState<User | null>(() => {
@@ -79,7 +60,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [token, user]);
 
-  const login = (jwtToken: string, userData: User) => {
+  useEffect(() => {
+    const syncRefreshedSession = () => {
+      const refreshedToken = localStorage.getItem("token");
+      const refreshedUser = localStorage.getItem("user");
+
+      setToken(refreshedToken);
+      setUser(refreshedUser ? JSON.parse(refreshedUser) : null);
+    };
+
+    window.addEventListener(AUTH_SESSION_UPDATED_EVENT, syncRefreshedSession);
+    return () => {
+      window.removeEventListener(
+        AUTH_SESSION_UPDATED_EVENT,
+        syncRefreshedSession,
+      );
+    };
+  }, []);
+
+  const login = (
+    jwtToken: string,
+    userData: User,
+    refreshToken?: string,
+  ) => {
+    setAuthSession(jwtToken, refreshToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+
     setToken(jwtToken);
     setUser(userData);
   };
@@ -89,6 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
 
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
   };
 

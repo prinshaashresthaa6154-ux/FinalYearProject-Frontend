@@ -10,6 +10,18 @@ import {
 } from "lucide-react";
 
 import hero from "../assets/Herosection.jpg";
+import everest from "../assets/Everest-base.jpeg";
+import pokhara from "../assets/Pokhara.jpg";
+import pashupatinath from "../assets/Pashupatinath.jpg";
+import lumbini from "../assets/Lumbini.jpg";
+import chitwan from "../assets/Chitwan.jpg";
+import bhaktapur from "../assets/Bhaktapur.jpg";
+import kathmandu from "../assets/Kathmandu.jpg";
+import pilgrimage from "../assets/pilgrimage.jpg";
+import para from "../assets/Para.jpg";
+import sonam from "../assets/sonam.jpg";
+import guide from "../assets/guide.jpg";
+import image from "../assets/Image.jpg";
 
 const Home = () => {
   const categories = [
@@ -24,7 +36,7 @@ const Home = () => {
     {
       id: 1,
       title: "Everest Base Camp",
-      image: "https://unsplash.com",
+      image: "src/assets/Everest-base.jpeg",
       location: "Solukhumbu, Koshi Province",
       description:
         "Trek to the foot of the world's highest peak through stunning Sherpa villages...",
@@ -34,7 +46,7 @@ const Home = () => {
     {
       id: 2,
       title: "Pokhara Lakeside",
-      image: "https://unsplash.com",
+      image: "src/assets/Pokhara.jpg",
       location: "Kaski, Gandaki Province",
       description:
         "Nepal's adventure capital with stunning lakes, mountain views, and...",
@@ -44,7 +56,7 @@ const Home = () => {
     {
       id: 3,
       title: "Pashupatinath Temple",
-      image: "https://unsplash.com",
+      image: "src/assets/pashupatinath.jpg",
       location: "Kathmandu, Bagmati Province",
       description:
         "Sacred Hindu temple complex and UNESCO World Heritage Site on the...",
@@ -54,7 +66,7 @@ const Home = () => {
     {
       id: 4,
       title: "Lumbini",
-      image: "https://unsplash.com",
+      image: "src/assets/Lumbini.jpg",
       location: "Rupandehi, Lumbini Province",
       description:
         "Birthplace of Lord Buddha and a UNESCO World Heritage Site with monasteries for...",
@@ -64,7 +76,7 @@ const Home = () => {
     {
       id: 5,
       title: "Chitwan National Park",
-      image: "https://unsplash.com",
+      image: "src/assets/Chitwan.jpg",
       location: "Chitwan, Bagmati Province",
       description:
         "Nepal's first national park and UNESCO site home to one-horned rhinos, tiger...",
@@ -74,7 +86,7 @@ const Home = () => {
     {
       id: 6,
       title: "Bhaktapur Durbar Square",
-      image: "https://unsplash.com",
+      image: "src/assets/Bhaktapur.jpg",
       location: "Bhaktapur, Bagmati Province",
       description:
         "Ancient Newari city with medieval architecture, pottery square, and...",
@@ -87,7 +99,7 @@ const Home = () => {
     {
       id: 1,
       title: "Kathmandu Valley Cultural Tour",
-      image: "https://unsplash.com",
+      image: "src/assets/Kathmandu.jpg",
       description:
         "Explore the ancient cities of the Kathmandu Valley-Kathmandu, Patan and Bhaktapur.....",
       duration: "5 Days/ 4 Nights",
@@ -98,7 +110,7 @@ const Home = () => {
     {
       id: 2,
       title: "Everest Base Camp Trek",
-      image: "https://unsplash.com",
+      image: "src/assets/Everest-base.jpeg",
       description:
         "The iconic trek to the base of the world's tallest peak through dramatic Himalayan.....",
       duration: "14 Days/ 13 Nights",
@@ -109,7 +121,7 @@ const Home = () => {
     {
       id: 3,
       title: "Nepal Religious Pilgrimage",
-      image: "https://unsplash.com",
+      image: "src/assets/Pilgrimage.jpg",
       description:
         "Visit Nepal's most sacred Hindu and Buddha sites including Pashupatinath, Muktinath......",
       duration: "7 Days/ 4 Nights", // Keeping layout values exact to image text constraints
@@ -120,7 +132,7 @@ const Home = () => {
     {
       id: 4,
       title: "Pokhara Adventure Packages",
-      image: "https://unsplash.com",
+      image: "src/assets/Para.jpg",
       description:
         "Paragliding, zip-lining, bungee jumping, and white-water rafting in Nepal's most...",
       duration: "4 Days/ 3 Nights",
@@ -133,30 +145,30 @@ const Home = () => {
   const guides = [
     {
       id: 1,
-      name: "Prinsha Shrestha",
+      name: "Pemba Sherpa",
       specialty: "High Altitude Trekking",
       experience: "12 years experience",
       trips: "340",
       rating: "4.2",
-      image: "https://unsplash.com", // Substitute with actual assets
+      image: "src/assets/sonam.jpg", // Substitute with actual assets
     },
     {
       id: 2,
-      name: "Pranisha Shrestha",
+      name: "Tenzing Bhote",
       specialty: "Cultural Tours Heritage",
       experience: "12 years experience",
       trips: "340",
       rating: "4.2",
-      image: "https://unsplash.com",
+      image: "src/assets/guide.jpg",
     },
     {
       id: 3,
-      name: "Biprima Shrestha",
+      name: "Ram Lama",
       specialty: "Wildlife Safari Adventure",
       experience: "12 years experience",
       trips: "340",
       rating: "4.2",
-      image: "https://unsplash.com",
+      image: "src/assets/Image.jpg",
     },
   ];
 

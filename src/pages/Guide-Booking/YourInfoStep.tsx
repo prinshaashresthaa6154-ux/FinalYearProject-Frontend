@@ -24,7 +24,11 @@ export default function YourInfoStep() {
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
-    setYourInfo({ fullName, email, phone });
+    setYourInfo({
+      fullName: fullName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+    });
     navigate(`/guidebook/${guide.id}/payment`);
   };
 

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import {getallusers} from "../services/UserService.js";
+import type { User } from "../services/UserService.js";
 
 
 const ListUsers = () => {
 
-    const [user, setUser] = useState([]);
+    const [user, setUser] = useState<User[]>([]);
      
     useEffect(() => {
         getUsers();

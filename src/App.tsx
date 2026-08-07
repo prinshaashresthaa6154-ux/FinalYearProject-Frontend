@@ -4,6 +4,8 @@ import ListUsers from "./pages/ListUsers";
 import UserForm from "./pages/UserForm";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Register from "./pages/Register";
 import DestinationDetail from "./pages/Destination";
 import EverestBooking from "./pages/TripDetails";
@@ -56,6 +58,8 @@ function App() {
           <Route path="/list-users" element={<ListUsers />} />
           <Route path="/user-form" element={<UserForm />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OtpVerification />} />
           <Route path="/destinations" element={<DestinationDetail />} />

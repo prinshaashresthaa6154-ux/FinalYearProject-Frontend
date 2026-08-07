@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { flushSync } from "react-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
@@ -11,22 +13,37 @@ type LoginForm = {
 
 type User = {
   id: number;
-  username: string;
+  fullName: string;
   email: string;
   role: string;
+  emailVerified: boolean;
 };
 
 type LoginResponse = {
-  token: string;
-  userDTO: User;
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+    tokenType: string;
+    expiresIn: number;
+    user: User;
+  };
+};
+
+type LoginErrorResponse = {
+  message?: string;
 };
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useAuth();
 
@@ -43,15 +60,47 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage("");
+    setIsSubmitting(true);
 
     try {
-      const response = await api.post<LoginResponse>("/auth/login", form);
-      login(response.data.token, response.data.userDTO);
-      alert("Login Success");
-      navigate("/");
+      const response = await api.post<LoginResponse>("/api/auth/login", {
+        email: form.email.trim(),
+        password: form.password,
+      });
+      const { accessToken, refreshToken, user } = response.data.data;
+
+      flushSync(() => {
+        login(
+          accessToken,
+          {
+            id: user.id,
+            username: user.fullName,
+            email: user.email,
+            role: user.role,
+          },
+          refreshToken,
+        );
+      });
+      navigate("/", { replace: true });
     } catch (error) {
-      console.log(error);
-      alert("Invalid credentials");
+      const message = axios.isAxiosError<LoginErrorResponse>(error)
+        ? error.response?.data?.message
+        : undefined;
+
+      if (message?.toLowerCase().includes("email is not verified")) {
+        navigate("/otp", {
+          state: {
+            email: form.email.trim(),
+            message,
+          },
+        });
+        return;
+      }
+
+      setErrorMessage(message || "Unable to sign in. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,6 +124,11 @@ const Login = () => {
             <p className="text-[#7c6f66] text-lg">
               Sign in to continue your journey
             </p>
+            {location.state?.message && (
+              <p role="status" className="mt-3 text-sm text-green-700">
+                {location.state.message}
+              </p>
+            )}
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
@@ -125,12 +179,19 @@ const Login = () => {
                 </div>
               </div>
 
+              {errorMessage && (
+                <p role="alert" className="text-sm text-red-700">
+                  {errorMessage}
+                </p>
+              )}
+
               {/* Sign In Button */}
               <button
                 type="submit"
-                className="w-full h-11 bg-red-700 hover:bg-red-800 text-white rounded-md font-medium transition duration-300"
+                disabled={isSubmitting}
+                className="w-full h-11 bg-red-700 hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed text-white rounded-md font-medium transition duration-300"
               >
-                Sign In
+                {isSubmitting ? "Signing In..." : "Sign In"}
               </button>
 
               {/* OR */}
@@ -163,6 +224,14 @@ const Login = () => {
                   className="text-red-700 font-medium cursor-pointer hover:underline"
                 >
                   Sign Up
+                </NavLink>
+              </p>
+              <p className="text-center text-sm">
+                <NavLink
+                  to="/forgot-password"
+                  className="text-red-700 font-medium hover:underline"
+                >
+                  Forgot your password?
                 </NavLink>
               </p>
             </form>

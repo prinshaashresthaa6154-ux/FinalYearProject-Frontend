@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
+
+type ApiResponse = {
+  message?: string;
+};
 
 const OtpVerification = () => {
   const [countdown, setCountdown] = useState<number>(42);
@@ -18,38 +22,64 @@ const OtpVerification = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
 
-  const email = location.state?.email;
+  const email = location.state?.email as string | undefined;
+  const initialMessage = location.state?.message as string | undefined;
 
   const [otp, setOtp] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState(initialMessage || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage("");
+
+    if (!email) {
+      setErrorMessage("Registration details are missing. Please register again.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
-      const response = await api.post("/auth/verify", {
+      await api.post("/api/auth/verify", {
         email,
         otp,
       });
 
-      login(response.data.token, response.data.userDTO);
-
-      navigate("/");
+      navigate("/login", {
+        replace: true,
+        state: { message: "Email verified successfully. You can now sign in." },
+      });
     } catch (error) {
-      console.log(error);
+      const message = axios.isAxiosError<ApiResponse>(error)
+        ? error.response?.data?.message
+        : undefined;
+      setErrorMessage(message || "Unable to verify the code. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleResend = async () => {
+    if (!email || countdown > 0) return;
+
+    setErrorMessage("");
+    setStatusMessage("");
+
     try {
-      const response = await api.post("/auth/resend-otp", {
+      const response = await api.post<ApiResponse>("/api/auth/resend-otp", {
         email,
       });
 
-      alert(response.data);
+      setCountdown(60);
+      setStatusMessage(response.data.message || "OTP resent successfully.");
     } catch (error) {
-      console.log(error);
+      const message = axios.isAxiosError<ApiResponse>(error)
+        ? error.response?.data?.message
+        : undefined;
+      setErrorMessage(message || "Unable to resend the code. Please try again.");
     }
   };
 
@@ -88,7 +118,11 @@ const OtpVerification = () => {
             <input
               type="text"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="\d{6}"
+              required
               maxLength={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none text-center text-lg font-semibold"
             />
@@ -96,19 +130,39 @@ const OtpVerification = () => {
 
           <button
             type="submit"
-            className="w-full bg-red-800 text-white font-semibold py-3 rounded-lg hover:opacity-90 transition cursor-pointer"
+            disabled={isSubmitting}
+            className="w-full bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg hover:opacity-90 transition cursor-pointer"
           >
-            Verify Account
+            {isSubmitting ? "Verifying..." : "Verify Account"}
           </button>
+          {errorMessage && (
+            <p role="alert" className="text-sm text-red-700">
+              {errorMessage}
+            </p>
+          )}
+          {statusMessage && (
+            <p role="status" className="text-sm text-green-700">
+              {statusMessage}
+            </p>
+          )}
           {/* Timer */}
           <div className="flex items-center justify-center gap-1.5 text-xs text-[#707070] mb-4">
             <span>◷</span>
 
-            <button onClick={handleResend}>Resend code in {countdown}s</button>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={countdown > 0}
+              className="disabled:cursor-not-allowed"
+            >
+              {countdown > 0 ? `Resend code in ${countdown}s` : "Resend code"}
+            </button>
           </div>
 
           {/* Back */}
           <button
+            type="button"
+            onClick={() => navigate("/login")}
             className="
               inline-flex 
               items-center 
