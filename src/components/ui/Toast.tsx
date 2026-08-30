@@ -1,0 +1,3 @@
+import { CheckCircle2, X } from "lucide-react";
+import type { ReactNode } from "react";
+export default function Toast({ message, onClose, icon = <CheckCircle2 className="h-5 w-5 text-[#1D78AF]" /> }: { message: string; onClose?: () => void; icon?: ReactNode }) { return <div role="status" className="flex items-center gap-3 rounded-lg border border-black/10 bg-white px-4 py-3 text-sm text-black shadow-lg">{icon}<span className="flex-1">{message}</span>{onClose && <button type="button" aria-label="Dismiss notification" onClick={onClose} className="rounded-md p-1 text-black/50 hover:bg-black/[0.05] hover:text-black"><X className="h-4 w-4" /></button>}</div>; }

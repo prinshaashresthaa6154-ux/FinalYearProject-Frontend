@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import everest from "../assets/Everest-base.jpeg";
 
 import { Check } from 'lucide-react';
 import { NavLink } from 'react-router';
@@ -15,7 +16,7 @@ export default function EverestBooking() {
       {/* Hero Banner Section */}
       <div className="relative h-64 sm:h-80 md:h-[400px] w-full overflow-hidden">
         <img 
-          src="https://source.unsplash.com/1600x900/?everest" 
+          src={everest}
           alt="Everest Base Camp" 
           className="w-full h-full object-cover"
         />

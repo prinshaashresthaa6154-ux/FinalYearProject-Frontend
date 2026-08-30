@@ -1,18 +1,10 @@
-import axios from "axios";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { NavLink, useSearchParams } from "react-router";
-import api from "../api/axios";
+import { authService } from "../services/authService";
+import { getApiError } from "../api/axios";
 
-type ResetPasswordResponse = {
-  success: boolean;
-  message: string;
-  data: null;
-};
-
-type ErrorResponse = {
-  message?: string;
-};
+const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,72}$/;
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -39,24 +31,27 @@ const ResetPassword = () => {
       return;
     }
 
+    if (!PASSWORD_PATTERN.test(newPassword)) {
+      setErrorMessage(
+        "Password must be 8-72 characters and include uppercase, lowercase, a number, and a special character.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const response = await api.post<ResetPasswordResponse>(
-        "/api/auth/reset-password",
-        { token, newPassword },
+      const response = await authService.resetPassword(
+        token,
+        newPassword,
       );
 
       setMessage(response.data.message || "Password reset successfully");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      const apiMessage = axios.isAxiosError<ErrorResponse>(error)
-        ? error.response?.data?.message
-        : undefined;
-
       setErrorMessage(
-        apiMessage || "Unable to reset your password. The link may have expired.",
+        getApiError(error).message || "Unable to reset your password. The link may have expired.",
       );
     } finally {
       setIsSubmitting(false);
@@ -111,6 +106,7 @@ const ResetPassword = () => {
                       autoComplete="new-password"
                       required
                       minLength={8}
+                      maxLength={72}
                       className="w-full h-11 px-4 pr-12 rounded-md border border-gray-300 bg-[#faf9f8] focus:outline-none focus:ring-2 focus:ring-red-700"
                     />
                     <button
@@ -140,6 +136,7 @@ const ResetPassword = () => {
                     autoComplete="new-password"
                     required
                     minLength={8}
+                    maxLength={72}
                     className="w-full h-11 px-4 rounded-md border border-gray-300 bg-[#faf9f8] focus:outline-none focus:ring-2 focus:ring-red-700"
                   />
                 </div>

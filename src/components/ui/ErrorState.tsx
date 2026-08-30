@@ -1,0 +1,2 @@
+import Button from "./Button";
+export default function ErrorState({ message = "Unable to load this information.", onRetry }: { message?: string; onRetry?: () => void }) { return <div role="alert" className="rounded-xl border border-[#AF1D1D]/20 bg-[#AF1D1D]/[0.06] px-5 py-10 text-center"><h2 className="font-display text-xl font-bold text-[#AF1D1D]">Something went wrong</h2><p className="mt-2 text-sm text-black/70">{message}</p>{onRetry && <Button type="button" variant="danger" onClick={onRetry} className="mt-5">Try again</Button>}</div>; }

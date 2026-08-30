@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { useLocation, useNavigate } from "react-router";
-import api from "../api/axios";
-
-type ApiResponse = {
-  message?: string;
-};
+import { Navigate, useLocation, useNavigate } from "react-router";
+import { authService } from "../services/authService";
+import { getApiError } from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 const OtpVerification = () => {
   const [countdown, setCountdown] = useState<number>(42);
@@ -22,64 +19,99 @@ const OtpVerification = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   const email = location.state?.email as string | undefined;
   const initialMessage = location.state?.message as string | undefined;
+  const role = location.state?.role as string | undefined;
+  const verificationStatus = location.state?.verificationStatus as
+    string | undefined;
+  const isGuide = role === "FREELANCE_GUIDE";
+  const isAdmin = role === "ADMIN";
 
   const [otp, setOtp] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState(initialMessage || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  if (!email) {
+    return <Navigate to="/login" replace />;
+  }
+
   const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
 
-    if (!email) {
-      setErrorMessage("Registration details are missing. Please register again.");
+    if (!/^\d{6}$/.test(otp)) {
+      setErrorMessage("Enter the exact six-digit verification code.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await api.post("/api/auth/verify", {
-        email,
-        otp,
-      });
+      const response = await authService.verifyOtp(email, otp);
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Email verification failed.");
+      }
+      const session = response.data.data;
+      if (isAdmin && session) {
+        login(session.accessToken, session.user, session.refreshToken);
+      }
 
-      navigate("/login", {
-        replace: true,
-        state: { message: "Email verified successfully. You can now sign in." },
-      });
+      navigate(
+        isGuide
+          ? "/guide/verification-status"
+          : isAdmin
+            ? "/pending-verification"
+            : "/login",
+        {
+          replace: true,
+          state: isGuide
+            ? {
+                emailVerified: true,
+                status: verificationStatus || "PENDING",
+                message:
+                  "Email verified successfully. Your guide application is awaiting admin approval.",
+              }
+            : isAdmin
+              ? {
+                  emailVerified: true,
+                  status: verificationStatus || "PENDING",
+                  email,
+                  message:
+                    "Email verified successfully. Your admin application is awaiting review.",
+                }
+              : {
+                  message: "Email verified successfully. You can now sign in.",
+                },
+        },
+      );
     } catch (error) {
-      const message = axios.isAxiosError<ApiResponse>(error)
-        ? error.response?.data?.message
-        : undefined;
-      setErrorMessage(message || "Unable to verify the code. Please try again.");
+      setErrorMessage(getApiError(error).message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleResend = async () => {
-    if (!email || countdown > 0) return;
+    if (countdown > 0) return;
 
     setErrorMessage("");
     setStatusMessage("");
 
     try {
-      const response = await api.post<ApiResponse>("/api/auth/resend-otp", {
-        email,
-      });
+      const response = await authService.resendOtp(email);
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Unable to resend the verification code.",
+        );
+      }
 
       setCountdown(60);
       setStatusMessage(response.data.message || "OTP resent successfully.");
     } catch (error) {
-      const message = axios.isAxiosError<ApiResponse>(error)
-        ? error.response?.data?.message
-        : undefined;
-      setErrorMessage(message || "Unable to resend the code. Please try again.");
+      setErrorMessage(getApiError(error).message);
     }
   };
 
@@ -102,7 +134,7 @@ const OtpVerification = () => {
         </h2>
 
         <p className="text-sm text-[#707070] mb-8">
-          Enter the 6-digit code sent to your email
+          Enter the 6-digit code sent to {email}
         </p>
 
         {/* Card */}
@@ -141,7 +173,10 @@ const OtpVerification = () => {
             </p>
           )}
           {statusMessage && (
-            <p role="status" className="text-sm text-green-700">
+            <p
+              role="status"
+              className="rounded-md bg-amber-50 px-3 py-2 text-sm leading-5 text-amber-900"
+            >
               {statusMessage}
             </p>
           )}
@@ -155,14 +190,31 @@ const OtpVerification = () => {
               disabled={countdown > 0}
               className="disabled:cursor-not-allowed"
             >
-              {countdown > 0 ? `Resend code in ${countdown}s` : "Resend code"}
+              {countdown > 0
+                ? `Resend code in ${countdown}s`
+                : "Send a new code"}
             </button>
           </div>
 
           {/* Back */}
           <button
             type="button"
-            onClick={() => navigate("/login")}
+            onClick={() =>
+              navigate(
+                isGuide
+                  ? "/guide/verification-status"
+                  : isAdmin
+                    ? "/pending-verification"
+                    : "/login",
+                {
+                  replace: true,
+                  state:
+                    isGuide || isAdmin
+                      ? { status: verificationStatus || "PENDING", email }
+                      : undefined,
+                },
+              )
+            }
             className="
               inline-flex 
               items-center 
@@ -173,7 +225,9 @@ const OtpVerification = () => {
               hover:text-[#1F1F1F]
             "
           >
-            ← Back to login
+            {isGuide || isAdmin
+              ? "Back to application status"
+              : "Back to login"}
           </button>
         </form>
       </div>

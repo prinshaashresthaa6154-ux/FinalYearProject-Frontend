@@ -1,14 +1,14 @@
-import React from "react";
 import { MapPin, Phone, Globe } from "lucide-react";
+import { Link } from "react-router";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#221513] text-white pt-14">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-34 pb-12">
+    <footer className="bg-black pt-14 text-white">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 pb-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-16">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Nepal Yatra</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Nepal Yatra</h2>
 
-          <p className="text-gray-300 leading-7">
+           <p className="max-w-xs text-sm leading-7 text-white/65">
             Your trusted companion for exploring the beauty, culture, and
             adventure of Nepal.
           </p>
@@ -17,39 +17,35 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-4">Explore</h3>
 
-          <ul className="space-y-2 text-gray-300">
-            <li className="hover:text-white cursor-pointer">Destinations</li>
-
-            <li className="hover:text-white cursor-pointer">Packages</li>
-
-            <li className="hover:text-white cursor-pointer">Culture</li>
-
-            <li className="hover:text-white cursor-pointer">Trekking</li>
-
-            <li className="hover:text-white cursor-pointer">Wildlife</li>
+           <ul className="space-y-2 text-sm text-white/65">
+            <li><Link to="/destinations" className="transition-colors hover:text-[#1D78AF]">Destinations</Link></li>
+            <li><Link to="/grouptrips" className="transition-colors hover:text-[#1D78AF]">Group Trips</Link></li>
+            <li><Link to="/guide" className="transition-colors hover:text-[#1D78AF]">Local Guides</Link></li>
+            <li><Link to="/destinations/1" className="transition-colors hover:text-[#1D78AF]">Trekking</Link></li>
+            <li><Link to="/destinations/5" className="transition-colors hover:text-[#1D78AF]">Wildlife</Link></li>
           </ul>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-4">Support</h3>
 
-          <ul className="space-y-2 text-gray-300">
-            <li className="hover:text-white cursor-pointer">FAQ</li>
+           <ul className="space-y-2 text-sm text-white/65">
+            <li>FAQ</li>
 
-            <li className="hover:text-white cursor-pointer">Safety Guide</li>
+            <li>Safety Guide</li>
 
-            <li className="hover:text-white cursor-pointer">Travel Advisory</li>
+            <li>Travel Advisory</li>
 
-            <li className="hover:text-white cursor-pointer">Emergency SOS</li>
+            <li>Emergency SOS</li>
 
-            <li className="hover:text-white cursor-pointer">Contact Us</li>
+            <li>Contact Us</li>
           </ul>
         </div>
 
         <div>
           <h3 className="text-lg font-semibold mb-4">Contact</h3>
 
-          <div className="space-y-3 text-gray-300">
+             <div className="space-y-3 text-sm text-white/65">
             <div className="flex items-start gap-2">
               <MapPin size={18} className="mt-1" />
               <p>Balambu, Kathmandu, Nepal</p>
@@ -68,7 +64,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-gray-700 py-5 text-center text-gray-400 text-sm">
+      <div className="border-t border-white/15 py-5 text-center text-sm text-white/50">
         © 2026 Nepal Yatra. All rights reserved
       </div>
     </footer>

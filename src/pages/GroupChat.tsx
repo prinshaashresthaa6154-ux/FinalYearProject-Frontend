@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   ArrowLeft,
@@ -19,9 +19,9 @@ import { getGroupTripById } from "../data/groupTrips";
 import { useGroupTrip } from "../context/GroupTripContext";
 
 export default function GroupChat() {
-  const { id } = useParams();
+  const { id, tripId: tripIdParam } = useParams();
   const navigate = useNavigate();
-  const tripId = Number(id);
+  const tripId = Number(tripIdParam ?? id);
   const trip = getGroupTripById(tripId);
   const { isJoined, membersByTrip, messagesByTrip, sendMessage } =
     useGroupTrip();
@@ -30,16 +30,16 @@ export default function GroupChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const members = membersByTrip[tripId] ?? [];
-  const messages = messagesByTrip[tripId] ?? [];
+  const messages = useMemo(() => messagesByTrip[tripId] ?? [], [messagesByTrip, tripId]);
   const onlineCount = members.filter((m) => m.online).length;
 
   useEffect(() => {
     if (!trip) {
-      navigate("/group-trips", { replace: true });
+      navigate("/grouptrips", { replace: true });
       return;
     }
     if (!isJoined(tripId)) {
-      navigate("/group-trips", { replace: true });
+      navigate("/grouptrips", { replace: true });
     }
   }, [trip, tripId, isJoined, navigate]);
 
@@ -63,7 +63,7 @@ export default function GroupChat() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3 min-w-0">
               <button
-                onClick={() => navigate("/group-trips")}
+                onClick={() => navigate("/grouptrips")}
                 className="mt-1 text-gray-500 hover:text-gray-700 md:hidden"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -113,7 +113,7 @@ export default function GroupChat() {
                 </button>
               </div>
               <button
-                onClick={() => navigate("/group-trips")}
+                onClick={() => navigate("/grouptrips")}
                 className="text-xs text-[#A51C1C] font-medium hover:underline hidden md:block"
               >
                 View trip details →

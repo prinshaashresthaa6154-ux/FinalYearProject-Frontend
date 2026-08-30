@@ -1,128 +1,260 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router";
-import { Compass, MapPin, Calendar, Star, ArrowRight } from "lucide-react";
 import {
-  DESTINATION_FILTERS,
-  DESTINATIONS,
-  type DestinationCategory,
-} from "../data/destinations";
+  ArrowRight,
+  ChevronDown,
+  Compass,
+  Heart,
+  MapPin,
+  Search,
+  Star,
+} from "lucide-react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router";
+import { getApiError } from "../api/axios";
+import Pagination from "../components/Pagination";
+import { EmptyState, ErrorState, LoadingSpinner } from "../components/ui";
+import { useAuth } from "../context/AuthContext";
+import { categoryService, type Category } from "../services/categoryService";
+import {
+  destinationService,
+  mediaUrl,
+  type Destination,
+} from "../services/destinationService";
+import { favoriteService } from "../services/favoriteService";
 
 export default function Destinations() {
-  const [activeFilter, setActiveFilter] = useState<"all" | DestinationCategory>(
-    "all",
-  );
-
-  const filtered = useMemo(() => {
-    if (activeFilter === "all") return DESTINATIONS;
-    return DESTINATIONS.filter((d) => d.category === activeFilter);
-  }, [activeFilter]);
-
+  const { token } = useAuth();
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [keyword, setKeyword] = useState("");
+  const [search, setSearch] = useState("");
+  const [categoryId, setCategoryId] = useState(0);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
+  const [favoriteLoading, setFavoriteLoading] = useState<number | null>(null);
+  useEffect(() => {
+    categoryService
+      .publicList({ page: 0, size: 100, sortBy: "name", sortDir: "asc" })
+      .then((response) => setCategories(response.data.data?.content ?? []))
+      .catch(() => setCategories([]));
+  }, []);
+  useEffect(() => {
+    if (!token) {
+      setFavoriteIds(new Set());
+      return;
+    }
+    favoriteService
+      .list({ page: 0, size: 100 })
+      .then((response) =>
+        setFavoriteIds(
+          new Set(
+            (response.data.data?.content ?? []).map(
+              (item) => item.destination.id,
+            ),
+          ),
+        ),
+      )
+      .catch(() => undefined);
+  }, [token]);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await destinationService.search({
+        keyword: search || undefined,
+        categoryId: categoryId || undefined,
+        page,
+        size: 9,
+        sortBy: "rating",
+        sortDir: "desc",
+      });
+      setDestinations(response.data.data?.content ?? []);
+      setTotalPages(response.data.data?.totalPages ?? 0);
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [categoryId, page, search]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    setPage(0);
+    setSearch(keyword.trim());
+  };
+  const toggleFavorite = async (id: number) => {
+    if (!token) return;
+    const active = favoriteIds.has(id);
+    setFavoriteLoading(id);
+    try {
+      if (active) await favoriteService.remove(id);
+      else await favoriteService.add(id);
+      setFavoriteIds((current) => {
+        const next = new Set(current);
+        if (active) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setFavoriteLoading(null);
+    }
+  };
   return (
-    <div className="min-h-screen bg-[#F7F3F0] font-sans">
-      <header className="bg-gradient-to-r from-[#A51C1C] to-[#2D3748] px-4 sm:px-6 md:px-16 py-10 sm:py-12 md:py-14">
-        <div className="max-w-7xl mx-auto text-center">
-          <span className="inline-flex items-center gap-1.5 bg-white/15 text-white text-xs font-medium px-3 py-1 rounded-full mb-3 sm:mb-4">
-            <Compass className="w-3.5 h-3.5 text-amber-300" />
-            Explore Nepal
-          </span>
-          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">
-            Destinations
-          </h1>
-          <p className="text-white/90 text-sm md:text-base max-w-xl mx-auto px-1">
-            Explore mountains, temples, wildlife reserves, and cultural heritage
-            sites across Nepal.
+    <main className="min-h-screen bg-[#f6f1e9]">
+      <header className="bg-[#251c17] px-5 py-16 text-white">
+        <div className="mx-auto max-w-6xl">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-[#e3a49e]">
+            <Compass className="h-4 w-4" /> Across Nepal
           </p>
+          <h1 className="mt-4 max-w-3xl font-display text-5xl font-bold sm:text-6xl">
+            Places worth making the journey for.
+          </h1>
+          <p className="mt-5 max-w-xl leading-7 text-[#d4c8c0]">
+            Discover active destinations, local context, and published trips
+            available in each place.
+          </p>
+          <form
+            onSubmit={submit}
+            className="mt-8 grid max-w-3xl gap-3 sm:grid-cols-[1fr_220px_auto]"
+          >
+            <div className="flex rounded-lg bg-white text-[#241f1a]">
+              <Search className="ml-4 mt-3.5 h-5 w-5 text-gray-400" />
+              <input
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+                placeholder="Search destinations"
+                className="min-w-0 flex-1 px-3 py-3 outline-none"
+              />
+            </div>
+            <div className="relative">
+              <select
+                value={categoryId}
+                onChange={(event) => {
+                  setCategoryId(Number(event.target.value));
+                  setPage(0);
+                }}
+                className="w-full appearance-none rounded-lg bg-white py-3 pl-3 pr-12 text-sm text-[#241f1a]"
+              >
+                <option value={0}>All categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1D78AF]"
+              />
+            </div>
+            <button className="rounded-lg bg-[#a62922] px-6 py-3 text-sm font-bold text-white">
+              Search
+            </button>
+          </form>
         </div>
       </header>
-
-      <main className="px-4 sm:px-6 md:px-16 py-6 sm:py-9">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-2 mb-6 sm:mb-8">
-            {DESTINATION_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                onClick={() => setActiveFilter(filter.id)}
-                className={`px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${
-                  activeFilter === filter.id
-                    ? "bg-[#A51C1C] text-white"
-                    : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
+      <section className="mx-auto max-w-6xl px-5 py-12">
+        {loading ? (
+          <div className="grid min-h-52 place-items-center">
+            <LoadingSpinner label="Loading destinations" />
           </div>
-
-          {filtered.length === 0 ? (
-            <p className="text-center text-gray-500 py-12 sm:py-16 text-sm sm:text-base">
-              No destinations match this filter.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-              {filtered.map((dest) => (
-                <Link
-                  key={dest.id}
-                  to={`/destinations/${dest.id}`}
-                  className="block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#A51C1C] focus-visible:ring-offset-2 hover:opacity-95 transition-opacity"
+        ) : error ? (
+          <ErrorState message={error} onRetry={() => void load()} />
+        ) : destinations.length === 0 ? (
+          <EmptyState
+            title="No destinations found"
+            description="No active destinations match the current search."
+          />
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {destinations.map((destination) => (
+                <article
+                  key={destination.id}
+                  className="overflow-hidden rounded-2xl bg-white shadow-[0_8px_28px_rgba(52,40,32,0.08)]"
                 >
-                  <article className="bg-white rounded-xl shadow-sm p-4 sm:p-5 flex flex-col h-full">
-                    <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2">
-                      <div className="min-w-0">
-                        <h2 className="font-display font-bold text-[#1A1A1A] text-sm sm:text-base leading-tight">
-                          {dest.title}
-                        </h2>
-                        <p className="flex items-start sm:items-center gap-1 text-xs text-gray-400 mt-1">
-                          <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 sm:mt-0" />
-                          <span className="break-words">{dest.location}</span>
-                        </p>
-                      </div>
-                      <span className="bg-[#2D3748] text-white text-[10px] font-medium px-2 sm:px-2.5 py-1 rounded-full shrink-0 whitespace-nowrap">
-                        {dest.categoryLabel}
-                      </span>
-                    </div>
-
-                    <p className="text-gray-500 text-sm leading-relaxed mb-3 sm:mb-4">
-                      {dest.description}
+                  <div className="relative">
+                    <Link
+                      to={`/destinations/${destination.slug}`}
+                      className="block h-64 overflow-hidden bg-[#ded4ca]"
+                    >
+                      {(destination.featuredImage ||
+                        destination.coverImage) && (
+                        <img
+                          src={mediaUrl(
+                            destination.featuredImage || destination.coverImage,
+                          )}
+                          alt={destination.name}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
+                    </Link>
+                    {token && (
+                      <button
+                        type="button"
+                        disabled={favoriteLoading === destination.id}
+                        onClick={() => void toggleFavorite(destination.id)}
+                        aria-label={
+                          favoriteIds.has(destination.id)
+                            ? "Remove from favorites"
+                            : "Save to favorites"
+                        }
+                        className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-[#a62922] shadow-sm disabled:opacity-50"
+                      >
+                        <Heart
+                          size={18}
+                          className={
+                            favoriteIds.has(destination.id)
+                              ? "fill-[#a62922]"
+                              : ""
+                          }
+                        />
+                      </button>
+                    )}
+                  </div>
+                  <Link
+                    to={`/destinations/${destination.slug}`}
+                    className="block p-5"
+                  >
+                    <p className="text-xs font-bold uppercase tracking-widest text-[#a62922]">
+                      {destination.category?.name}
                     </p>
-
-                    <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-xs text-gray-400 mb-3 sm:mb-4">
+                    <h2 className="mt-2 font-display text-2xl font-bold">
+                      {destination.name}
+                    </h2>
+                    <p className="mt-2 flex items-center gap-1 text-sm text-gray-500">
+                      <MapPin className="h-4 w-4" /> {destination.location}
+                    </p>
+                    <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#675b52]">
+                      {destination.shortDescription}
+                    </p>
+                    <div className="mt-5 flex items-center justify-between text-sm">
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 shrink-0" />
-                        {dest.bestTime}
+                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />{" "}
+                        {Number(destination.rating).toFixed(1)}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                        {dest.rating}
-                      </span>
-                      <span>Altitude: {dest.altitude}</span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
-                      <span className="text-[11px] text-gray-500 border border-gray-200 rounded-full px-2.5 py-0.5">
-                        {dest.categoryLabel}
-                      </span>
-                      <span className="text-[11px] text-gray-500 border border-gray-200 rounded-full px-2.5 py-0.5">
-                        Best: {dest.bestTime}
+                      <span className="inline-flex items-center gap-1 font-bold text-[#a62922]">
+                        Explore <ArrowRight className="h-4 w-4" />
                       </span>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-auto pt-4 border-t border-gray-100">
-                      <p className="font-display text-[#A51C1C] font-bold text-lg leading-none">
-                        From ${dest.price.toLocaleString("en-US")}
-                      </p>
-                      <span className="inline-flex items-center justify-center gap-1.5 bg-[#A51C1C] text-white text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap w-full sm:w-auto">
-                        View Details
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </article>
-                </Link>
+                  </Link>
+                </article>
               ))}
             </div>
-          )}
-        </div>
-      </main>
-    </div>
+            <Pagination
+              page={page + 1}
+              totalPages={totalPages}
+              onPageChange={(nextPage) => setPage(nextPage - 1)}
+            />
+          </>
+        )}
+      </section>
+    </main>
   );
 }

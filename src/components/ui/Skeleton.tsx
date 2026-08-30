@@ -1,0 +1,1 @@
+export default function Skeleton({ className = "h-5 w-full" }: { className?: string }) { return <span aria-hidden="true" className={`block animate-pulse rounded-md bg-black/[0.08] ${className}`} />; }

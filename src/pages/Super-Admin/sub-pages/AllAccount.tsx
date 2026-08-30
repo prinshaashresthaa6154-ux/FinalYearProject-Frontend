@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
-import { 
-  Activity, Users, Database, Settings, BarChart3, 
-  Search, Eye, UserX 
-} from 'lucide-react';
+import { useState } from 'react';
+import { Search, Eye, UserX } from 'lucide-react';
 
 export default function AllAccountsPanel() {
-  const [activeTab, setActiveTab] = useState('All Accounts');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const tabs = [
-    { name: 'System Overview', icon: Activity },
-    { name: 'All Accounts', icon: Users },
-    { name: 'System Logs', icon: Database },
-    { name: 'Platform Settings', icon: Settings },
-    { name: 'Analytics', icon: BarChart3 },
-  ];
 
   const initialUsers = [
     { id: 'U001', name: 'Admin Kathmandu', email: 'admin@ktm.com', role: 'Admin', status: 'Active', lastLogin: '2 hours ago' },

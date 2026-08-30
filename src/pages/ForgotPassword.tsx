@@ -1,18 +1,8 @@
-import axios from "axios";
 import { ArrowLeft, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { NavLink } from "react-router";
-import api from "../api/axios";
-
-type ForgotPasswordResponse = {
-  success: boolean;
-  message: string;
-  data: null;
-};
-
-type ErrorResponse = {
-  message?: string;
-};
+import { authService } from "../services/authService";
+import { getApiError } from "../api/axios";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -27,22 +17,15 @@ const ForgotPassword = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.post<ForgotPasswordResponse>(
-        "/api/auth/forgot-password",
-        { email: email.trim() },
-      );
+      const response = await authService.forgotPassword(email.trim());
 
       setMessage(
         response.data.message ||
           "If the email exists, password reset instructions have been sent",
       );
     } catch (error) {
-      const apiMessage = axios.isAxiosError<ErrorResponse>(error)
-        ? error.response?.data?.message
-        : undefined;
-
       setErrorMessage(
-        apiMessage || "Unable to send reset instructions. Please try again.",
+        getApiError(error).message || "Unable to send reset instructions. Please try again.",
       );
     } finally {
       setIsSubmitting(false);

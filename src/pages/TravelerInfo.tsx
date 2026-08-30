@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
+import everest from "../assets/Everest-base.jpeg";
 
 export default function EverestTravelerDetails() {
   const [fullName, setFullName] = useState('');
@@ -14,7 +15,7 @@ export default function EverestTravelerDetails() {
       {/* Hero Banner Section */}
       <div className="relative h-64 sm:h-80 md:h-[400px] w-full overflow-hidden">
         <img 
-          src="https://unsplash.com" 
+          src={everest}
           alt="Everest Base Camp" 
           className="w-full h-full object-cover"
         />

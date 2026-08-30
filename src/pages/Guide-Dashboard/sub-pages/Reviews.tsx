@@ -1,146 +1,15 @@
-import { Star } from "lucide-react";
-
-const summary = {
-  rating: "4.9",
-  total: 245,
-  breakdown: [
-    { stars: 5, percent: 82 },
-    { stars: 4, percent: 12 },
-    { stars: 3, percent: 4 },
-    { stars: 2, percent: 1 },
-    { stars: 1, percent: 1 },
-  ],
-};
-
-const reviews = [
-  {
-    id: 1,
-    initials: "SJ",
-    name: "Sarah Johnson",
-    trip: "Everest Base Camp Trek",
-    rating: 5,
-    date: "Mar 18, 2026",
-    text: "Pemba was an outstanding guide. Safety-focused, knowledgeable, and made the whole trek memorable.",
-  },
-  {
-    id: 2,
-    initials: "YH",
-    name: "Yuki Harada",
-    trip: "Langtang Valley Trek",
-    rating: 5,
-    date: "Feb 28, 2026",
-    text: "Excellent pacing and great local insights. Highly recommend for first-time trekkers.",
-  },
-  {
-    id: 3,
-    initials: "JW",
-    name: "James Wilson",
-    trip: "Manaslu Circuit",
-    rating: 4,
-    date: "Jan 12, 2026",
-    text: "Professional throughout. Weather was tough but Pemba handled logistics perfectly.",
-  },
-  {
-    id: 4,
-    initials: "EC",
-    name: "Emily Chen",
-    trip: "Annapurna Circuit",
-    rating: 5,
-    date: "Dec 20, 2025",
-    text: "Warm, reliable, and always looking after the group. Would book again.",
-  },
-];
-
-function Stars({ count }: { count: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`w-3.5 h-3.5 ${
-            i < count ? "fill-amber-400 text-amber-400" : "text-gray-300"
-          }`}
-        />
-      ))}
-    </div>
-  );
-}
+import { LoaderCircle, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getApiError } from "../../../api/axios";
+import { EmptyState, ErrorState } from "../../../components/ui";
+import { guideService, type GuideProfile } from "../../../services/guideService";
+import type { TripReview } from "../../../services/reviewService";
 
 export default function Reviews() {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#1a130e] font-serif mb-4">
-            Rating Overview
-          </h2>
-          <div className="text-center mb-5">
-            <div className="text-4xl font-bold font-serif text-[#1a130e]">
-              {summary.rating}
-            </div>
-            <div className="flex justify-center mt-1">
-              <Stars count={5} />
-            </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {summary.total} reviews
-            </p>
-          </div>
-          <div className="space-y-2">
-            {summary.breakdown.map((row) => (
-              <div key={row.stars} className="flex items-center gap-2 text-xs">
-                <span className="w-8 text-gray-500">{row.stars}★</span>
-                <div className="flex-1 h-2 rounded-full bg-[#f3ede8] overflow-hidden">
-                  <div
-                    className="h-full bg-[#b31919] rounded-full"
-                    style={{ width: `${row.percent}%` }}
-                  />
-                </div>
-                <span className="w-8 text-right text-gray-400">
-                  {row.percent}%
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-[#f0eae4]">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Recent Reviews
-            </h2>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {reviews.map((review) => (
-              <div key={review.id} className="px-5 py-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#1e2a44] text-white flex items-center justify-center text-xs font-semibold shrink-0">
-                      {review.initials}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#1a130e]">
-                        {review.name}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {review.trip}
-                      </p>
-                      <div className="mt-1.5">
-                        <Stars count={review.rating} />
-                      </div>
-                      <p className="text-sm text-[#2c2520] mt-2 leading-relaxed">
-                        {review.text}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-400 shrink-0">
-                    {review.date}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const [profile, setProfile] = useState<GuideProfile | null>(null); const [reviews, setReviews] = useState<TripReview[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
+  useEffect(() => { guideService.me().then(async (response) => { const guide = response.data.data; setProfile(guide ?? null); if (guide) { const reviewResponse = await guideService.reviews(guide.id); setReviews(reviewResponse.data.data?.content ?? []); } }).catch((e) => setError(getApiError(e).message)).finally(() => setLoading(false)); }, []);
+  if (loading) return <div className="grid min-h-52 place-items-center"><LoaderCircle className="h-8 w-8 animate-spin text-[#b31919]" /></div>;
+  if (error) return <ErrorState message={error} />;
+  const distribution = [5,4,3,2,1].map((rating) => ({ rating, count: reviews.filter((review) => review.rating === rating).length }));
+  return <div className="grid gap-6 lg:grid-cols-[280px_1fr]"><aside className="h-fit rounded-2xl border border-[#eae3dc] bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-widest text-[#b31919]">Published feedback</p><p className="mt-4 text-center font-display text-5xl font-bold">{Number(profile?.rating ?? 0).toFixed(1)}</p><p className="mt-1 text-center text-xs text-gray-500">{reviews.length} reviews</p><div className="mt-6 space-y-2">{distribution.map((row) => <div key={row.rating} className="flex items-center gap-2 text-xs"><span className="w-7">{row.rating}★</span><div className="h-2 flex-1 overflow-hidden rounded-full bg-[#f3ede8]"><div className="h-full bg-[#b31919]" style={{ width: `${reviews.length ? row.count / reviews.length * 100 : 0}%` }} /></div><span>{row.count}</span></div>)}</div></aside><section><h2 className="font-display text-2xl font-bold">Traveler reviews</h2>{reviews.length === 0 ? <div className="mt-5"><EmptyState title="No published reviews yet" description="Reviews from trips assigned to you will appear after admin moderation." /></div> : <div className="mt-5 space-y-4">{reviews.map((review) => <article key={review.id} className="rounded-2xl border border-[#eae3dc] bg-white p-5 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3"><div><b>{review.reviewer.name}</b><p className="mt-1 text-xs text-gray-500">{review.trip.title}</p></div><span className="flex">{[1,2,3,4,5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= review.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />)}</span></div><h3 className="mt-4 font-bold">{review.title}</h3><p className="mt-2 text-sm leading-6 text-[#675b52]">{review.comment}</p><p className="mt-3 text-xs text-gray-500">{new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(review.createdAt))}</p></article>)}</div>}</section></div>;
 }

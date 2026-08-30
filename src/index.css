@@ -1,6 +1,160 @@
-@import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Averia Serif Libre", serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #af1d1d;
+  --color-brand-dark: #881717;
+  --color-accent: #1d78af;
+  --color-accent-dark: #155d89;
+  --color-ink: #000000;
+  --color-muted: #5c5c5c;
+  --color-surface: #ffffff;
+  --color-canvas: #f8f8f8;
+  --color-line: #dedede;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: #f8f8f8;
+    color: #000000;
+    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.9375rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: rgba(29, 120, 175, 0.2);
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(175, 29, 29, 0.28);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .section-kicker {
+    color: #af1d1d;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .page-canvas {
+    min-height: calc(100vh - 72px);
+    background: #f8f8f8;
+  }
+
+  .surface-card {
+    border: 1px solid #dedede;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .auth-input {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid #d6d6d6;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+  }
+
+  .auth-input:focus {
+    border-color: #1d78af;
+    box-shadow: 0 0 0 3px rgba(29, 120, 175, 0.14);
+  }
+}
+
+@layer components {
+  .filter-surface {
+    border: 1px solid #dedede;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .field-control {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid #d6d6d6;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    color: #000000;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .field-control:hover:not(:disabled) {
+    border-color: #9f9f9f;
+  }
+
+  .field-control:focus {
+    border-color: #1d78af;
+    box-shadow: 0 0 0 3px rgba(29, 120, 175, 0.14);
+  }
+
+  .field-control:disabled {
+    cursor: not-allowed;
+    background: #f3f3f3;
+    color: #777777;
+  }
+
+  .filter-fields input:not([type="checkbox"]):not([type="radio"]),
+  .filter-fields select {
+    min-height: 2.75rem;
+    width: 100%;
+    border: 1px solid #d6d6d6;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    padding: 0.625rem 0.75rem;
+    color: #000000;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .filter-fields input:not([type="checkbox"]):not([type="radio"]):focus,
+  .filter-fields select:focus {
+    border-color: #1d78af;
+    box-shadow: 0 0 0 3px rgba(29, 120, 175, 0.14);
+  }
+}
+.superadmin-content a[href="/admin/categories/create"],
+.superadmin-content a[href="/admin/destinations/create"],
+.superadmin-content a[href="/admin/trips/create"] {
+  display: none;
 }

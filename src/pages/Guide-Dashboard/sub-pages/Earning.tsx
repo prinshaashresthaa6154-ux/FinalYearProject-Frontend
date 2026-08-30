@@ -1,171 +1,54 @@
-import { Wallet, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock, LoaderCircle, ReceiptText, Wallet } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { getApiError } from "../../../api/axios";
+import { EmptyState, ErrorState, StatusBadge } from "../../../components/ui";
+import { guideBookingService, type GuideBooking } from "../../../services/guideBookingService";
 
-const summary = [
-  {
-    label: "Total Earnings",
-    value: "$28,400",
-    icon: Wallet,
-    iconColor: "text-emerald-600",
-    bgIcon: "bg-emerald-50",
-  },
-  {
-    label: "This Month",
-    value: "$3,840",
-    icon: TrendingUp,
-    iconColor: "text-blue-500",
-    bgIcon: "bg-blue-50",
-  },
-  {
-    label: "Pending Payout",
-    value: "$1,120",
-    icon: Clock,
-    iconColor: "text-amber-500",
-    bgIcon: "bg-amber-50",
-  },
-  {
-    label: "Paid Out",
-    value: "$27,280",
-    icon: CheckCircle2,
-    iconColor: "text-rose-500",
-    bgIcon: "bg-rose-50",
-  },
-];
-
-const monthly = [
-  { month: "March 2026", amount: "$3,840", trips: 4 },
-  { month: "February 2026", amount: "$2,960", trips: 3 },
-  { month: "January 2026", amount: "$2,240", trips: 2 },
-  { month: "December 2025", amount: "$4,100", trips: 5 },
-];
-
-const transactions = [
-  {
-    id: 1,
-    trip: "Everest Base Camp Trek",
-    client: "Sarah Johnson",
-    date: "2026-03-28",
-    amount: "$1,120",
-    status: "Paid",
-  },
-  {
-    id: 2,
-    trip: "Annapurna Circuit",
-    client: "Mark Thompson",
-    date: "2026-03-20",
-    amount: "$960",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    trip: "Langtang Valley Trek",
-    client: "Yuki Harada",
-    date: "2026-03-12",
-    amount: "$560",
-    status: "Paid",
-  },
-  {
-    id: 4,
-    trip: "Manaslu Circuit",
-    client: "James Wilson",
-    date: "2026-02-28",
-    amount: "$1,280",
-    status: "Paid",
-  },
-];
+const money = (booking: GuideBooking, amount: number | null | undefined) =>
+  `${booking.currency || "NPR"} ${Number(amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function Earnings() {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summary.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.label}
-              className="bg-white border border-[#eae3dc] rounded-2xl p-5 shadow-sm flex items-start gap-4"
-            >
-              <div className={`p-2.5 rounded-xl ${item.bgIcon} shrink-0`}>
-                <Icon className={`w-5 h-5 ${item.iconColor}`} />
-              </div>
-              <div>
-                <div className="text-2xl font-bold tracking-tight text-[#1a130e] font-serif">
-                  {item.value}
-                </div>
-                <div className="text-xs text-gray-400 font-medium mt-0.5">
-                  {item.label}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+  const [rows, setRows] = useState<GuideBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#1a130e] font-serif mb-4">
-            Revenue by Month
-          </h2>
-          <div className="space-y-3">
-            {monthly.map((item) => (
-              <div
-                key={item.month}
-                className="flex items-center justify-between rounded-xl bg-[#f7f3ef] px-4 py-3.5"
-              >
-                <div>
-                  <span className="text-sm font-medium text-[#2c2520]">
-                    {item.month}
-                  </span>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {item.trips} trips
-                  </p>
-                </div>
-                <span className="text-sm font-semibold text-[#b31919] tabular-nums">
-                  {item.amount}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await guideBookingService.requests(0, 100);
+      setRows((response.data.data?.content ?? []).filter((row) => row.type === "DIRECT" && row.status === "CONFIRMED"));
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-6 pb-4">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Recent Transactions
-            </h2>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="flex items-center justify-between gap-3 px-6 py-3.5"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#1a130e] truncate">
-                    {tx.trip}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {tx.client} · {tx.date}
-                  </p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold text-[#1a130e]">
-                    {tx.amount}
-                  </p>
-                  <span
-                    className={`text-xs font-medium ${
-                      tx.status === "Paid"
-                        ? "text-emerald-600"
-                        : "text-amber-600"
-                    }`}
-                  >
-                    {tx.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+  useEffect(() => { void load(); }, [load]);
+  if (loading) return <div className="grid min-h-64 place-items-center"><LoaderCircle className="h-8 w-8 animate-spin text-[#a62922]" /></div>;
+  if (error) return <ErrorState message={error} onRetry={() => void load()} />;
+
+  const paid = rows.filter((row) => row.paymentStatus === "PAID");
+  const unpaid = rows.filter((row) => row.paymentStatus !== "PAID");
+  const paidNet = paid.reduce((sum, row) => sum + Number(row.guideNetAmount ?? 0), 0);
+  const pendingNet = unpaid.reduce((sum, row) => sum + Number(row.guideNetAmount ?? 0), 0);
+  const commission = rows.reduce((sum, row) => sum + Number(row.commissionAmount ?? 0), 0);
+  const currency = rows[0]?.currency || "NPR";
+  const format = (value: number) => `${currency} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  return <div className="space-y-6">
+    <div><p className="text-xs font-bold uppercase tracking-widest text-[#a62922]">Direct guide services</p><h1 className="mt-1 font-display text-3xl font-bold">Earnings and commission</h1><p className="mt-2 text-sm text-gray-500">Amounts are fixed when you accept a request. Platform commission is deducted from your gross service fee.</p></div>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Metric icon={Wallet} label="Paid guide revenue" value={format(paidNet)} />
+      <Metric icon={Clock} label="Awaiting payment" value={format(pendingNet)} />
+      <Metric icon={ReceiptText} label="Platform commission" value={format(commission)} />
+      <Metric icon={CheckCircle2} label="Accepted requests" value={String(rows.length)} />
     </div>
-  );
+    {rows.length === 0 ? <EmptyState title="No accepted requests" description="Accepted direct bookings and their financial split will appear here." /> : <div className="overflow-x-auto rounded-2xl border border-[#eae3dc] bg-white shadow-sm"><table className="w-full min-w-[850px] text-left text-sm"><thead className="bg-[#faf7f4] text-xs uppercase text-gray-500"><tr><th className="p-4">Traveler</th><th className="p-4">Destination</th><th className="p-4">Service fee</th><th className="p-4">Commission</th><th className="p-4">Your revenue</th><th className="p-4">Payment</th></tr></thead><tbody className="divide-y">{rows.map((row) => <tr key={row.id}><td className="p-4 font-semibold">{row.user.name}</td><td className="p-4">{row.destination?.name}</td><td className="p-4">{money(row, row.totalAmount)}<p className="text-xs text-gray-500">{row.billableDays} day(s)</p></td><td className="p-4">{money(row, row.commissionAmount)} <span className="text-xs text-gray-500">({row.commissionPercentage}%)</span></td><td className="p-4 font-semibold text-[#a62922]">{money(row, row.guideNetAmount)}</td><td className="p-4"><StatusBadge status={row.paymentStatus || "UNPAID"} /></td></tr>)}</tbody></table></div>}
+  </div>;
+}
+
+function Metric({ icon: Icon, label, value }: { icon: typeof Wallet; label: string; value: string }) {
+  return <div className="rounded-2xl border border-[#eae3dc] bg-white p-5 shadow-sm"><Icon className="h-5 w-5 text-[#a62922]" /><p className="mt-3 text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-gray-500">{label}</p></div>;
 }

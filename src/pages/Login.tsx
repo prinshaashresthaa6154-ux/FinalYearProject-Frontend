@@ -1,38 +1,25 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { flushSync } from "react-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { NavLink, useLocation, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
-import api, { clearAuthSession } from "../api/axios";
+import { useAuth, type User } from "../context/AuthContext";
+import {
+  authService,
+  getAuthUser,
+  type AuthUser,
+} from "../services/authService";
+import {
+  APP_ROLES,
+  getRoleHome,
+  normalizeRole,
+  requiresVerificationReview,
+} from "../auth/roles";
+import { getApiError } from "../api/axios";
+import { Button, Input } from "../components/ui";
 
 type LoginForm = {
   email: string;
   password: string;
-};
-
-type User = {
-  id: number;
-  fullName: string;
-  email: string;
-  role: string;
-  emailVerified: boolean;
-};
-
-type LoginResponse = {
-  success: boolean;
-  message: string;
-  data: {
-    accessToken: string;
-    refreshToken: string;
-    tokenType: string;
-    expiresIn: number;
-    user: User;
-  };
-};
-
-type LoginErrorResponse = {
-  message?: string;
 };
 
 const Login = () => {
@@ -45,10 +32,11 @@ const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login } = useAuth();
+  const { login, updateUser } = useAuth();
 
   const googleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    setErrorMessage("");
+    authService.startGoogleOAuth();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,50 +52,55 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.post<LoginResponse>("/api/auth/login", {
-        email: form.email.trim(),
-        password: form.password,
-      });
-      const { accessToken, refreshToken, user } = response.data.data;
+      const response = await authService.login(
+        form.email.trim(),
+        form.password,
+      );
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Unable to sign in.");
+      }
+      const session = response.data.data;
+      if (!session) throw new Error("Login response did not include a session");
+      const { accessToken, refreshToken, user } = session;
+      const sessionUser: User = {
+        ...user,
+        username: user.username ?? user.fullName,
+      };
 
       flushSync(() => {
-        login(
-          accessToken,
-          {
-            id: user.id,
-            username: user.fullName,
-            email: user.email,
-            role: user.role,
-          },
-          refreshToken,
-        );
+        login(accessToken, sessionUser, refreshToken);
       });
-      navigate("/", { replace: true });
-    } catch (error) {
-      const message = axios.isAxiosError<LoginErrorResponse>(error)
-        ? error.response?.data?.message
-        : undefined;
 
-      const normalizedMessage = message?.toLowerCase();
-      const requiresVerification =
-        normalizedMessage?.includes("not verified") ||
-        normalizedMessage?.includes("unverified");
-
-      if (requiresVerification) {
-        navigate("/otp", {
-          state: {
-            email: form.email.trim(),
-            message,
-          },
+      let currentUser: AuthUser = user;
+      try {
+        const currentUserResponse =
+          await authService.getCurrentUser(accessToken);
+        const latestUser = getAuthUser(currentUserResponse.data);
+        currentUser = latestUser ? { ...user, ...latestUser } : user;
+        updateUser({
+          ...currentUser,
+          username: currentUser.username ?? currentUser.fullName,
         });
-        return;
+      } catch (currentUserError) {
+        void currentUserError;
       }
 
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        clearAuthSession();
-      }
-
-      setErrorMessage(message || "Unable to sign in. Please try again.");
+      const role = normalizeRole(currentUser.role);
+      const requestedDestination = location.state?.from;
+      const destination =
+        role === APP_ROLES.FREELANCE_GUIDE &&
+        (!currentUser.emailVerified || requiresVerificationReview(currentUser))
+          ? "/guide/verification-status"
+          : role === APP_ROLES.ADMIN && requiresVerificationReview(currentUser)
+            ? "/pending-verification"
+            : role === APP_ROLES.USER && requestedDestination
+              ? requestedDestination
+              : getRoleHome(currentUser.role);
+      navigate(destination, { replace: true });
+    } catch (error) {
+      setErrorMessage(
+        getApiError(error).message || "Unable to sign in. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -116,121 +109,115 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f5f4]">
+    <div className="flex min-h-screen flex-col bg-[#f8f8f8]">
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md mt-12 mb-8">
           {/* Heading */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#2d1f1f] font-serif mb-4">
+            <h1 className="mb-4 text-4xl font-bold text-black">
               Nepal Yatra
             </h1>
 
-            <h2 className="text-3xl font-bold text-[#2d1f1f] mb-2 font-serif">
+            <h2 className="mb-2 text-3xl font-bold text-black">
               Welcome Back
             </h2>
 
-            <p className="text-[#7c6f66] text-lg">
+            <p className="text-lg text-black/60">
               Sign in to continue your journey
             </p>
             {location.state?.message && (
-              <p role="status" className="mt-3 text-sm text-green-700">
+              <p role="status" className="mt-3 rounded-lg border border-[#1D78AF]/20 bg-[#1D78AF]/10 px-3 py-2 text-sm text-[#155D89]">
                 {location.state.message}
               </p>
             )}
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <div className="rounded-xl border border-black/10 bg-white p-6 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-[#2d1f1f] mb-2">
-                  <Mail size={16} />
-                  Email
-                </label>
-
-                <input
+              <div className="relative">
+                <Mail size={16} className="absolute left-3 top-[2.7rem] z-10 text-black/45" />
+                <Input
+                  label="Email"
                   type="email"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
                   placeholder="email@example.com"
                   required
-                  className="w-full h-11 px-4 rounded-md border border-gray-300 bg-[#faf9f8] focus:outline-none focus:ring-2 focus:ring-red-700"
+                  className="pl-9"
                 />
               </div>
 
               {/* Password */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-[#2d1f1f] mb-2">
-                  <Lock size={16} />
-                  Password
-                </label>
-
-                <div className="relative">
-                  <input
+              <div className="relative">
+                <Lock size={16} className="absolute left-3 top-[2.7rem] z-10 text-black/45" />
+                <Input
+                    label="Password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     name="password"
                     value={form.password}
                     onChange={handleChange}
                     required
-                    className="w-full h-11 px-4 rounded-md border border-gray-300 bg-[#faf9f8] focus:outline-none focus:ring-2 focus:ring-red-700"
+                    className="pl-9 pr-12"
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500"
+                    className="absolute bottom-3 right-3 text-black/50 hover:text-black"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
-                </div>
               </div>
 
               {errorMessage && (
-                <p role="alert" className="text-sm text-red-700">
+                <p role="alert" className="rounded-lg border border-[#AF1D1D]/20 bg-[#AF1D1D]/10 px-3 py-2 text-sm text-[#AF1D1D]">
                   {errorMessage}
                 </p>
               )}
 
               {/* Sign In Button */}
-              <button
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-11 bg-red-700 hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed text-white rounded-md font-medium transition duration-300"
+                loading={isSubmitting}
+                className="w-full"
               >
-                {isSubmitting ? "Signing In..." : "Sign In"}
-              </button>
+                Sign In
+              </Button>
 
               {/* OR */}
               <div className="text-center text-gray-500 text-sm">Or</div>
 
               {/* Google Login */}
-              <button
+              <Button
                 onClick={googleLogin}
                 type="button"
-                className="w-full h-11 border border-gray-300 rounded-md flex items-center justify-center gap-3 hover:bg-gray-50 transition"
+                variant="secondary"
+                className="w-full"
               >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
                   alt="Google"
                   className="w-5 h-5"
                 />
-                <span className="text-sm font-medium text-[#2d1f1f]">
+                <span className="text-sm font-medium">
                   Login with Google
                 </span>
-              </button>
+              </Button>
 
               {/* Divider */}
               <div className="border-t border-gray-200"></div>
 
               {/* Signup */}
-              <p className="text-center text-sm text-[#7c6f66]">
+              <p className="text-center text-sm text-black/60">
                 Don&apos;t have an account?{" "}
                 <NavLink
                   to="/register"
-                  className="text-red-700 font-medium cursor-pointer hover:underline"
+                  className="font-semibold text-[#1D78AF] hover:underline"
                 >
                   Sign Up
                 </NavLink>
@@ -238,7 +225,7 @@ const Login = () => {
               <p className="text-center text-sm">
                 <NavLink
                   to="/forgot-password"
-                  className="text-red-700 font-medium hover:underline"
+                  className="font-semibold text-[#1D78AF] hover:underline"
                 >
                   Forgot your password?
                 </NavLink>

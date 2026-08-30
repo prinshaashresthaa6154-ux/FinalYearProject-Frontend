@@ -93,7 +93,11 @@ export default function AdminNotifications() {
                 )}
                 <button
                   type="button"
-                  onClick={() => deleteNotification(n.id)}
+                  onClick={() => {
+                    if (confirm(`Delete notification "${n.title}"?`)) {
+                      deleteNotification(n.id);
+                    }
+                  }}
                   className="p-2 text-[#b31919] hover:bg-red-50 rounded-lg"
                 >
                   <Trash2 className="w-4 h-4" />

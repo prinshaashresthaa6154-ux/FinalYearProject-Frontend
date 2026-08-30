@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
   useCallback,
@@ -99,7 +100,7 @@ export function GroupTripProvider({ children }: { children: ReactNode }) {
           {
             id: `join-${Date.now()}`,
             type: "system",
-            text: `${fullName} joined the group via guide booking. • ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+            text: `${fullName} joined the group as a member. • ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
             time: "",
           },
         ],

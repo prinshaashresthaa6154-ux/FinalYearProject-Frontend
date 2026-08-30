@@ -1,379 +1,44 @@
-import { useNavigate } from "react-router";
-import {
-  Users,
-  Briefcase,
-  Compass,
-  Map,
-  CalendarCheck,
-  Clock,
-  CheckCircle2,
-  Wallet,
-  Plus,
-  UserPlus,
-  Megaphone,
-  FileBarChart,
-} from "lucide-react";
-import { useAdminPlatform } from "../../../context/AdminPlatformContext";
+import { BarChart3, CalendarCheck, CheckCircle2, Clock3, Compass, FileBarChart, FolderTree, LoaderCircle, Map, MessageSquare, Plus, Star, TicketCheck, Wallet } from "lucide-react";
+import { useCallback, useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { Link } from "react-router";
+import { getApiError } from "../../../api/axios";
+import { ErrorState } from "../../../components/ui";
+import { adminDashboardService, type AdminDashboardData, type AdminReport, type ReportPoint } from "../../../services/adminDashboardService";
+
+type Metric = { label: string; value: string | number; icon: ComponentType<{ className?: string }>; path: string; tone: string };
+const quickActions = [
+  { label: "Create Category", path: "/admin/categories/create", icon: FolderTree, primary: true },
+  { label: "Create Destination", path: "/admin/destinations/create", icon: Compass, primary: true },
+  { label: "Create Trip", path: "/admin/trips/create", icon: Map, primary: true },
+  { label: "View Bookings", path: "/admin/bookings", icon: CalendarCheck },
+  { label: "View Reviews", path: "/admin/reviews", icon: Star },
+];
 
 export default function AdminOverview() {
-  const navigate = useNavigate();
-  const {
-    users,
-    guides,
-    destinations,
-    trips,
-    bookings,
-    reviews,
-    notifications,
-  } = useAdminPlatform();
-
-  const pendingBookings = bookings.filter((b) => b.status === "Pending").length;
-  const completedTrips = trips.filter((t) => t.status === "Completed").length;
-  const activeGuides = guides.filter((g) => g.status === "Active").length;
-  const tourists = users.filter((u) => u.role === "Tourist").length;
-
-  const stats = [
-    {
-      label: "Total Users",
-      value: String(tourists),
-      icon: Users,
-      iconColor: "text-red-500",
-      bgIcon: "bg-red-50",
-    },
-    {
-      label: "Total Guides",
-      value: String(activeGuides),
-      icon: Briefcase,
-      iconColor: "text-teal-500",
-      bgIcon: "bg-teal-50",
-    },
-    {
-      label: "Destinations",
-      value: String(destinations.length),
-      icon: Compass,
-      iconColor: "text-amber-500",
-      bgIcon: "bg-amber-50",
-    },
-    {
-      label: "Total Trips",
-      value: String(trips.length),
-      icon: Map,
-      iconColor: "text-blue-500",
-      bgIcon: "bg-blue-50",
-    },
-    {
-      label: "Total Bookings",
-      value: String(bookings.length),
-      icon: CalendarCheck,
-      iconColor: "text-indigo-500",
-      bgIcon: "bg-indigo-50",
-    },
-    {
-      label: "Pending Bookings",
-      value: String(pendingBookings),
-      icon: Clock,
-      iconColor: "text-orange-500",
-      bgIcon: "bg-orange-50",
-    },
-    {
-      label: "Completed Trips",
-      value: String(completedTrips),
-      icon: CheckCircle2,
-      iconColor: "text-emerald-600",
-      bgIcon: "bg-emerald-50",
-    },
-    {
-      label: "Revenue Overview",
-      value: "NPR 42L",
-      icon: Wallet,
-      iconColor: "text-rose-500",
-      bgIcon: "bg-rose-50",
-    },
+  const [dashboard, setDashboard] = useState<AdminDashboardData | null>(null); const [bookings, setBookings] = useState<AdminReport | null>(null); const [revenue, setRevenue] = useState<AdminReport | null>(null); const [trips, setTrips] = useState<AdminReport | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const dashboardResponse = await adminDashboardService.dashboard(); setDashboard(dashboardResponse.data.data ?? null); const [bookingResponse, revenueResponse, tripResponse] = await Promise.allSettled([adminDashboardService.bookingReport(), adminDashboardService.revenueReport(), adminDashboardService.tripReport()]); setBookings(bookingResponse.status === "fulfilled" ? bookingResponse.value.data.data ?? null : null); setRevenue(revenueResponse.status === "fulfilled" ? revenueResponse.value.data.data ?? null : null); setTrips(tripResponse.status === "fulfilled" ? tripResponse.value.data.data ?? null : null); } catch (requestError) { setDashboard(null); setError(getApiError(requestError).message); } finally { setLoading(false); } }, []); useEffect(() => { void load(); }, [load]);
+  if (loading) return <div className="grid min-h-[55vh] place-items-center"><LoaderCircle className="h-9 w-9 animate-spin text-[#b31919]" /></div>;
+  if (error || !dashboard) return <ErrorState message={error || "Admin dashboard data is unavailable."} onRetry={() => void load()} />;
+  const metrics: Metric[] = [
+    { label: "Categories", value: dashboard.totalCategories, icon: FolderTree, path: "/admin/categories", tone: "bg-violet-50 text-violet-700" },
+    { label: "Destinations", value: dashboard.totalDestinations, icon: Compass, path: "/admin/destinations", tone: "bg-amber-50 text-amber-700" },
+    { label: "Trips", value: dashboard.totalTrips, icon: Map, path: "/admin/trips", tone: "bg-blue-50 text-blue-700" },
+    { label: "Published Trips", value: dashboard.publishedTrips, icon: CheckCircle2, path: "/admin/trips", tone: "bg-green-50 text-green-700" },
+    { label: "Draft Trips", value: dashboard.draftTrips, icon: FileBarChart, path: "/admin/trips", tone: "bg-gray-100 text-gray-700" },
+    { label: "Bookings", value: dashboard.totalBookings, icon: TicketCheck, path: "/admin/bookings", tone: "bg-indigo-50 text-indigo-700" },
+    { label: "Pending Bookings", value: dashboard.pendingBookings, icon: Clock3, path: "/admin/bookings", tone: "bg-orange-50 text-orange-700" },
+    { label: "Completed Bookings", value: dashboard.completedBookings, icon: CalendarCheck, path: "/admin/bookings", tone: "bg-emerald-50 text-emerald-700" },
+    { label: "Revenue", value: `NPR ${Number(dashboard.revenue).toLocaleString()}`, icon: Wallet, path: "/admin/reports", tone: "bg-rose-50 text-rose-700" },
+    { label: "Average Rating", value: Number(dashboard.averageRating).toFixed(1), icon: Star, path: "/admin/reviews", tone: "bg-yellow-50 text-yellow-700" },
+    { label: "Reviews", value: dashboard.reviewCount, icon: MessageSquare, path: "/admin/reviews", tone: "bg-cyan-50 text-cyan-700" },
   ];
-
-  const popularDestinations = [...destinations]
-    .sort((a, b) => b.reviews - a.reviews)
-    .slice(0, 5);
-
-  const bookingStats = [
-    {
-      label: "Approved",
-      count: bookings.filter((b) => b.status === "Approved").length,
-      color: "bg-[#b31919]",
-    },
-    { label: "Pending", count: pendingBookings, color: "bg-orange-400" },
-    {
-      label: "Completed",
-      count: bookings.filter((b) => b.status === "Completed").length,
-      color: "bg-emerald-500",
-    },
-    {
-      label: "Cancelled",
-      count: bookings.filter((b) => b.status === "Cancelled").length,
-      color: "bg-gray-400",
-    },
-  ];
-  const bookingTotal = Math.max(1, bookings.length);
-
-  const recentBookings = bookings.slice(0, 4);
-  const recentUsers = users.filter((u) => u.role === "Tourist").slice(0, 4);
-  const recentReviews = reviews
-    .filter((r) => r.visibility === "Visible")
-    .slice(0, 3);
-  const timeline = [
-    ...bookings.slice(0, 2).map((b) => ({
-      time: b.date,
-      text: `Booking ${b.id}: ${b.tourist} → ${b.trip}`,
-      tone: "booking",
-    })),
-    ...notifications.slice(0, 2).map((n) => ({
-      time: n.createdAt,
-      text: `Announcement: ${n.title}`,
-      tone: "notice",
-    })),
-    ...reviews.slice(0, 2).map((r) => ({
-      time: r.date,
-      text: `Review by ${r.author} on ${r.target}`,
-      tone: "review",
-    })),
-  ].slice(0, 6);
-
-  const quickActions = [
-    { label: "Add Destination", path: "/admin/destinations", icon: Plus },
-    { label: "Create Trip", path: "/admin/trips", icon: Map },
-    { label: "Manage Users", path: "/admin/users", icon: UserPlus },
-    { label: "Send Notice", path: "/admin/notifications", icon: Megaphone },
-    { label: "View Reports", path: "/admin/reports", icon: FileBarChart },
-  ];
-
-  return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={stat.label}
-              className="bg-white border border-[#eae3dc] rounded-2xl p-5 shadow-sm flex flex-col justify-between min-h-[120px]"
-            >
-              <div className={`p-2.5 rounded-xl ${stat.bgIcon} w-fit`}>
-                <Icon className={`w-5 h-5 ${stat.iconColor}`} />
-              </div>
-              <div className="mt-3">
-                <div className="text-2xl font-bold tracking-tight text-[#1a130e] font-serif">
-                  {stat.value}
-                </div>
-                <div className="text-xs text-gray-400 font-medium mt-0.5">
-                  {stat.label}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#1a130e] font-serif mb-5">
-            Booking Statistics
-          </h2>
-          <div className="space-y-4">
-            {bookingStats.map((item) => (
-              <div key={item.label} className="space-y-1.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-700 font-medium">
-                    {item.label}
-                  </span>
-                  <span className="text-gray-400 font-mono">{item.count}</span>
-                </div>
-                <div className="w-full bg-[#f3ede8] h-2 rounded-full overflow-hidden">
-                  <div
-                    className={`${item.color} h-full rounded-full`}
-                    style={{ width: `${(item.count / bookingTotal) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#1a130e] font-serif mb-5">
-            Popular Destinations
-          </h2>
-          <div className="space-y-4">
-            {popularDestinations.map((dest, idx) => (
-              <div
-                key={dest.id}
-                className="flex items-center justify-between text-sm"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="text-gray-400 w-4">{idx + 1}.</span>
-                  <span className="font-semibold text-[#2c2520] truncate">
-                    {dest.title}
-                  </span>
-                </div>
-                <span className="text-gray-400 tabular-nums shrink-0 ml-3">
-                  {dest.reviews.toLocaleString()}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-6">
-          <h2 className="text-lg font-bold text-[#1a130e] font-serif mb-5">
-            Quick Actions
-          </h2>
-          <div className="space-y-2">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={action.label}
-                  type="button"
-                  onClick={() => navigate(action.path)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-[#eae3dc] hover:bg-[#faf7f4] text-sm font-medium text-[#2c2520] transition"
-                >
-                  <Icon className="w-4 h-4 text-[#b31919]" />
-                  {action.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-[#f0eae4] flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Recent Bookings
-            </h2>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/bookings")}
-              className="text-sm text-[#b31919] hover:underline"
-            >
-              View All
-            </button>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {recentBookings.map((b) => (
-              <div
-                key={b.id}
-                className="px-5 py-3.5 flex items-center justify-between gap-3"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#1a130e] truncate">
-                    {b.tourist}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    {b.trip} · {b.date}
-                  </p>
-                </div>
-                <span
-                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                    b.status === "Pending"
-                      ? "bg-[#1e2a44] text-white"
-                      : b.status === "Approved" || b.status === "Completed"
-                        ? "bg-[#b31919] text-white"
-                        : "bg-gray-300 text-gray-700"
-                  }`}
-                >
-                  {b.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-[#f0eae4] flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Recent Users
-            </h2>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/users")}
-              className="text-sm text-[#b31919] hover:underline"
-            >
-              View All
-            </button>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {recentUsers.map((u) => (
-              <div
-                key={u.id}
-                className="px-5 py-3.5 flex items-center justify-between gap-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-[#1a130e]">
-                    {u.name}
-                  </p>
-                  <p className="text-xs text-gray-400">{u.email}</p>
-                </div>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                    u.status === "Active"
-                      ? "bg-[#b31919] text-white"
-                      : "bg-gray-400 text-white"
-                  }`}
-                >
-                  {u.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-[#f0eae4]">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Recent Reviews
-            </h2>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {recentReviews.map((r) => (
-              <div key={r.id} className="px-5 py-3.5">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-[#1a130e]">
-                    {r.author}
-                  </p>
-                  <span className="text-xs text-amber-500 font-medium">
-                    {r.rating}★
-                  </span>
-                </div>
-                <p className="text-xs text-gray-400 mt-0.5">{r.target}</p>
-                <p className="text-sm text-[#2c2520] mt-1 line-clamp-2">
-                  {r.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-[#f0eae4]">
-            <h2 className="text-lg font-bold text-[#1a130e] font-serif">
-              Activity Timeline
-            </h2>
-          </div>
-          <div className="divide-y divide-[#f5efe9]">
-            {timeline.map((item, idx) => (
-              <div key={idx} className="px-5 py-3.5 flex gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#b31919] mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm text-[#2c2520]">{item.text}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="space-y-8"><header className="overflow-hidden rounded-3xl bg-[#251c17] p-7 text-white sm:p-9"><div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.24em] text-[#e4a098]">Tourism business overview</p><h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">Admin Dashboard</h1><p className="mt-4 max-w-2xl leading-7 text-[#d4c8c0]">Owner-scoped bookings, trips, revenue, ratings, and performance from the backend.</p></div><Link to="/admin/reports" className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-5 py-3 text-sm font-bold"><BarChart3 className="h-4 w-4" /> Open reports</Link></div></header><section className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">{metrics.map(({ label, value, icon: Icon, path, tone }) => <Link key={label} to={path} className="rounded-2xl border border-[#eae3dc] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><span className={`grid h-9 w-9 place-items-center rounded-xl ${tone}`}><Icon className="h-4 w-4" /></span><p className="mt-4 font-display text-2xl font-bold break-words">{value}</p><p className="mt-1 text-xs font-semibold text-gray-500">{label}</p></Link>)}</section><section className="rounded-2xl border border-[#eae3dc] bg-white p-6 shadow-sm"><div><p className="text-xs font-bold uppercase tracking-widest text-[#b31919]">Quick actions</p><h2 className="mt-2 font-display text-2xl font-bold">Manage your tourism business</h2></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">{quickActions.map(({ label, path, icon: Icon, primary }) => <Link key={label} to={path} className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-bold transition ${primary ? "border-[#b31919] bg-[#b31919] text-white hover:bg-[#941414]" : "border-[#e5ddd6] hover:bg-[#fcfaf8]"}`}><Icon className="h-4 w-4" /> {label}{primary && <Plus className="ml-auto h-3.5 w-3.5" />}</Link>)}</div></section><div className="grid gap-6 xl:grid-cols-2"><ChartCard title="Booking trend" description="Monthly booking volume from owner-scoped reports."><BarSeries points={bookings?.timeSeries ?? []} value="count" /></ChartCard><ChartCard title="Revenue trend" description="Monthly paid revenue returned by the backend."><BarSeries points={revenue?.timeSeries ?? []} value="value" currency /></ChartCard><ChartCard title="Trip performance" description="Top owned trips ranked by backend booking and revenue performance."><RankedTrips report={trips} /></ChartCard><ChartCard title="Rating overview" description="Published reviews and average rating for this admin's trips."><RatingOverview rating={dashboard.averageRating} reviews={dashboard.reviewCount} /></ChartCard></div><section className="grid gap-6 lg:grid-cols-2"><StatusOverview title="Booking status" points={bookings?.statusSeries ?? []} total={dashboard.totalBookings} /><StatusOverview title="Trip publishing" points={[{ label: "PUBLISHED", count: dashboard.publishedTrips, value: 0 }, { label: "DRAFT", count: dashboard.draftTrips, value: 0 }, { label: "OTHER", count: Math.max(0, dashboard.totalTrips - dashboard.publishedTrips - dashboard.draftTrips), value: 0 }]} total={dashboard.totalTrips} /></section></div>;
 }
+
+function ChartCard({ title, description, children }: { title: string; description: string; children: ReactNode }) { return <section className="rounded-2xl border border-[#eae3dc] bg-white p-6 shadow-sm"><h2 className="font-display text-2xl font-bold">{title}</h2><p className="mt-2 text-sm text-gray-500">{description}</p><div className="mt-6">{children}</div></section>; }
+function BarSeries({ points, value, currency = false }: { points: ReportPoint[]; value: "count" | "value"; currency?: boolean }) { if (!points.length) return <NoSeries />; const maximum = Math.max(1, ...points.map((point) => Number(point[value]))); return <div className="flex h-56 items-end gap-2 overflow-x-auto border-b border-[#d8cec0] pb-1">{points.map((point) => { const amount = Number(point[value]); return <div key={point.label} className="flex min-w-12 flex-1 flex-col items-center justify-end gap-2"><span className="text-[10px] font-semibold text-gray-500">{currency ? compact(amount) : amount}</span><div className="w-full max-w-12 rounded-t-md bg-[#b31919] transition-all" style={{ height: `${Math.max(4, amount / maximum * 160)}px` }} /><span className="whitespace-nowrap text-[10px] text-gray-400">{point.label}</span></div>; })}</div>; }
+function RankedTrips({ report }: { report: AdminReport | null }) { const rows = report?.rankedItems ?? []; if (!rows.length) return <NoSeries />; const maximum = Math.max(1, ...rows.map((row) => row.count)); return <div className="space-y-4">{rows.slice(0, 6).map((row, index) => <div key={row.id}><div className="flex justify-between gap-3 text-sm"><span className="truncate font-semibold">{index + 1}. {row.label}</span><span className="shrink-0 text-gray-500">{row.count} bookings · {row.currency || "NPR"} {Number(row.amount).toLocaleString()}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-[#f1ebe6]"><div className="h-full rounded-full bg-[#b31919]" style={{ width: `${row.count / maximum * 100}%` }} /></div></div>)}</div>; }
+function RatingOverview({ rating, reviews }: { rating: number; reviews: number }) { const percentage = Math.max(0, Math.min(100, Number(rating) / 5 * 100)); return <div className="flex flex-col items-center gap-6 sm:flex-row"><div className="relative grid h-40 w-40 place-items-center rounded-full" style={{ background: `conic-gradient(#d49a25 ${percentage}%, #eee7e1 0)` }}><div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center"><span><b className="font-display text-4xl">{Number(rating).toFixed(1)}</b><small className="block text-gray-500">out of 5</small></span></div></div><div><div className="flex gap-1">{[1,2,3,4,5].map((star) => <Star key={star} className={`h-6 w-6 ${star <= Math.round(Number(rating)) ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />)}</div><p className="mt-4 text-3xl font-bold">{reviews}</p><p className="text-sm text-gray-500">published reviews</p><Link to="/admin/reviews" className="mt-4 inline-block text-sm font-bold text-[#b31919]">Moderate reviews</Link></div></div>; }
+function StatusOverview({ title, points, total }: { title: string; points: ReportPoint[]; total: number }) { return <section className="rounded-2xl border border-[#eae3dc] bg-white p-6 shadow-sm"><h2 className="font-display text-xl font-bold">{title}</h2><div className="mt-5 space-y-4">{points.length ? points.map((point) => <div key={point.label}><div className="flex justify-between text-sm"><span className="font-semibold">{point.label.replaceAll("_", " ")}</span><span className="text-gray-500">{point.count}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-[#f1ebe6]"><div className="h-full rounded-full bg-[#b31919]" style={{ width: `${total ? point.count / total * 100 : 0}%` }} /></div></div>) : <NoSeries />}</div></section>; }
+function NoSeries() { return <div className="grid h-40 place-items-center rounded-xl border border-dashed border-[#d8cec0] text-center text-sm text-gray-500">No reporting data is available yet.</div>; }
+function compact(value: number) { return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value); }

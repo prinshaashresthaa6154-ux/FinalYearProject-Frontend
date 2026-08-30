@@ -1,274 +1,137 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { User, Mail, Lock, Eye, EyeOff, ChevronDown } from "lucide-react";
-import { NavLink, useNavigate } from "react-router";
-import api from "../api/axios";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { getApiError } from "../api/axios";
+import { authService } from "../services/authService";
+import AdminRegistration from "./AdminRegistration";
+import GuideRegistration from "./GuideRegistration";
+import { Button } from "../components/ui";
 
-type RegisterRole = "USER" | "GUIDE";
+type RegisterTab = "user" | "guide" | "admin";
+type RegisterForm = { fullName: string; email: string; password: string };
 
-type RegisterForm = {
-  fullName: string;
-  email: string;
-  password: string;
-  role: RegisterRole | "";
-};
+const tabs: Array<{ id: RegisterTab; label: string }> = [
+  { id: "user", label: "User" },
+  { id: "guide", label: "Guide" },
+  { id: "admin", label: "Admin" },
+];
 
-type ValidationErrorResponse = {
-  message?: string;
-  data?: Record<string, string> | string[];
-};
-
-type RegisterResponse = {
-  success: boolean;
-  message: string;
-  data: null;
-  timestamp: string;
-};
+const isRegisterTab = (value: string | null): value is RegisterTab =>
+  tabs.some((tab) => tab.id === value);
 
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState<RegisterForm>({
-    fullName: "",
-    email: "",
-    password: "",
-    role: "",
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("role");
+  const activeTab: RegisterTab = isRegisterTab(requestedTab) ? requestedTab : "user";
+  const [form, setForm] = useState<RegisterForm>({ fullName: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+  const selectTab = (tab: RegisterTab) => {
+    setErrorMessage("");
+    setSearchParams(tab === "user" ? {} : { role: tab });
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setForm({
-      ...form,
-      role: e.target.value as RegisterForm["role"],
-    });
-  };
-
-  const googleLogin = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const submitUser = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setErrorMessage("");
     setIsSubmitting(true);
-
-    const fullName = form.fullName.trim();
     const email = form.email.trim();
-    const payload = {
-      fullName,
-      email,
-      password: form.password,
-      role: form.role,
-    };
 
     try {
-      const response = await api.post<RegisterResponse>(
-        "/api/auth/register",
-        payload,
-      );
-
-      if (!response.data.success) {
-        setErrorMessage(response.data.message || "Registration failed");
-        return;
-      }
-
-      navigate("/otp", {
-        state: {
-          email,
-          message: response.data.message,
-        },
+      const response = await authService.register({
+        fullName: form.fullName.trim(),
+        email,
+        password: form.password,
+        role: "USER",
+      });
+      if (!response.data.success) throw new Error(response.data.message || "Registration failed");
+      navigate("/verify-account", {
+        state: { email, message: response.data.message, role: "USER" },
       });
     } catch (error) {
-      const errorData = axios.isAxiosError<ValidationErrorResponse>(error)
-        ? error.response?.data
-        : undefined;
-      const validationErrors = errorData?.data
-        ? Object.values(errorData.data).join(" ")
-        : undefined;
-      const message = validationErrors || errorData?.message;
-
-      setErrorMessage(message || "Unable to register. Please try again.");
+      const apiError = getApiError(error);
+      setErrorMessage(Object.values(apiError.validationErrors).join(" ") || apiError.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f5] flex items-center justify-center px-4">
-      <div className="w-full max-w-lg mt-12 mb-12">
-        {/* Heading */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#2d1f1f] mb-3">
-            Nepal Yatra
-          </h1>
+    <main className="min-h-screen bg-[#f8f8f8] px-4 py-10 text-black sm:px-6">
+      <div className={`mx-auto ${activeTab === "user" ? "max-w-xl" : activeTab === "guide" ? "max-w-4xl" : "max-w-3xl"}`}>
+        <header className="text-center">
+          <Link to="/" className="font-display text-2xl font-bold text-black">Nepal Yatra</Link>
+          <h1 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Create your account</h1>
+          <p className="mt-2 text-sm text-black/60">Choose how you will use Nepal Yatra.</p>
+        </header>
 
-          <h2 className="text-3xl font-semibold text-[#2d1f1f] mb-2">
-            Create Account
-          </h2>
-
-          <p className="text-gray-500">Join Nepal Yatra and start exploring</p>
-        </div>
-
-        {/* Card */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white border border-gray-200 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] p-8"
-        >
-          {/* Full Name */}
-          <div className="mb-5">
-            <label className="flex items-center gap-2 text-sm mb-2 font-medium text-gray-700">
-              <User size={16} />
-              Full Name
-            </label>
-
-            <input
-              type="text"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              autoComplete="name"
-              required
-              minLength={2}
-              maxLength={150}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-1 focus:ring-red-300"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-5">
-            <label className="flex items-center gap-2 text-sm mb-2 font-medium text-gray-700">
-              <Mail size={16} />
-              Email
-            </label>
-
-            <input
-              type="email"
-              placeholder="email@example.com"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              autoComplete="email"
-              required
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-1 focus:ring-red-300"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="mb-5">
-            <label className="flex items-center gap-2 text-sm mb-2 font-medium text-gray-700">
-              <Lock size={16} />
-              Password
-            </label>
-
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="********"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={72}
-                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+"
-                title="Use 8-72 characters with uppercase, lowercase, a number, and a special character."
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 pr-12 outline-none focus:ring-1 focus:ring-red-300"
-              />
-
+        <section className="mt-8 rounded-xl border border-black/10 border-t-4 border-t-[#AF1D1D] bg-white p-5 shadow-sm sm:p-8">
+          <div role="tablist" aria-label="Account type" className="grid grid-cols-3 border-b border-black/10">
+            {tabs.map((tab) => (
               <button
+                key={tab.id}
                 type="button"
-                onClick={() => setShowPassword((visible) => !visible)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                role="tab"
+                id={`register-tab-${tab.id}`}
+                aria-selected={activeTab === tab.id}
+                aria-controls={`register-panel-${tab.id}`}
+                onClick={() => selectTab(tab.id)}
+                className={`min-h-12 border-b-2 px-3 text-sm font-semibold transition ${activeTab === tab.id ? "border-[#AF1D1D] text-[#AF1D1D]" : "border-transparent text-black/55 hover:bg-black/[0.04] hover:text-black"}`}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {tab.label}
               </button>
-            </div>
-            <p className="mt-2 text-xs text-gray-500">
-              Use 8-72 characters with uppercase, lowercase, a number, and a
-              special character.
-            </p>
+            ))}
           </div>
 
-          {/* Role */}
-          <div className="mb-6">
-            <label className="text-sm font-medium block mb-2 text-gray-700">
-              Role
-            </label>
-
-            <div className="relative">
-              <select
-                name="role"
-                value={form.role}
-                onChange={handleSelectChange}
-                required
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 appearance-none outline-none focus:ring-1 focus:ring-red-300"
-              >
-                <option value="">Select Role</option>
-                <option value="USER">User</option>
-                <option value="GUIDE">Guide</option>
-              </select>
-
-              <ChevronDown
-                size={18}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-            </div>
+          <div id={`register-panel-${activeTab}`} role="tabpanel" aria-labelledby={`register-tab-${activeTab}`} className="mt-7">
+            {activeTab === "user" && (
+              <form onSubmit={submitUser} className="space-y-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#1D78AF]">Traveler account</p>
+                  <h2 className="mt-2 font-display text-2xl font-bold">Start planning your journey</h2>
+                </div>
+                <Field icon={User} label="Full name">
+                  <input name="fullName" value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} autoComplete="name" required minLength={2} maxLength={150} className="auth-input" placeholder="Enter your full name" />
+                </Field>
+                <Field icon={Mail} label="Email">
+                  <input type="email" name="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} autoComplete="email" required className="auth-input" placeholder="email@example.com" />
+                </Field>
+                <Field icon={Lock} label="Password">
+                  <div className="relative">
+                    <input type={showPassword ? "text" : "password"} name="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} autoComplete="new-password" required minLength={8} maxLength={72} pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+" title="Use 8-72 characters with uppercase, lowercase, a number, and a special character." className="auth-input pr-12" placeholder="Create a strong password" />
+                    <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-black/45 hover:text-black">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-black/55">Use 8-72 characters with uppercase, lowercase, a number, and a special character.</p>
+                </Field>
+                {errorMessage && <p role="alert" className="rounded-lg border border-[#AF1D1D]/20 bg-[#AF1D1D]/10 px-4 py-3 text-sm text-[#AF1D1D]">{errorMessage}</p>}
+                <Button type="submit" loading={isSubmitting} className="min-h-12 w-full">
+                  Create user account
+                </Button>
+                <div className="flex items-center gap-3 text-xs uppercase text-black/40"><span className="h-px flex-1 bg-black/10" /><span>or</span><span className="h-px flex-1 bg-black/10" /></div>
+                <Button type="button" variant="secondary" onClick={() => authService.startGoogleOAuth()} className="min-h-12 w-full">
+                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" className="h-5 w-5" />
+                  Continue with Google
+                </Button>
+              </form>
+            )}
+            {activeTab === "guide" && <GuideRegistration embedded />}
+            {activeTab === "admin" && <AdminRegistration embedded />}
           </div>
 
-          {errorMessage && (
-            <p role="alert" className="mb-4 text-sm text-red-700">
-              {errorMessage}
-            </p>
-          )}
-
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-red-700 hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-3 rounded-lg font-medium transition"
-          >
-            {isSubmitting ? "Creating Account..." : "Create Account"}
-          </button>
-
-          {/* Divider */}
-          <div className="text-center my-5 text-gray-400">Or</div>
-
-          {/* Google */}
-          <button
-            type="button"
-            onClick={googleLogin}
-            className="w-full border border-gray-200 rounded-lg py-3 flex items-center justify-center gap-2 hover:bg-gray-50 transition"
-          >
-            Continue with
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="google"
-              className="w-5 h-5"
-            />
-          </button>
-
-          {/* Footer */}
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Already have an account?{" "}
-            <NavLink to="/login">
-              <span className="text-red-700 font-medium cursor-pointer">
-                Sign In
-              </span>
-            </NavLink>
+          <p className="mt-8 border-t border-black/10 pt-6 text-center text-sm text-black/60">
+            Already have an account? <Link to="/login" className="font-semibold text-[#1D78AF] hover:underline">Login</Link>
           </p>
-        </form>
+        </section>
       </div>
-    </div>
+    </main>
   );
+}
+
+function Field({ icon: Icon, label, children }: { icon: typeof User; label: string; children: ReactNode }) {
+  return <label className="block"><span className="mb-2 flex items-center gap-2 text-sm font-semibold"><Icon size={16} aria-hidden="true" />{label}</span>{children}</label>;
 }

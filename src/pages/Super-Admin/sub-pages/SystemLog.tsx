@@ -1,19 +1,4 @@
-import React, { useState } from 'react';
-import { 
-  Activity, Users, Database, Settings, BarChart3 
-} from 'lucide-react';
-
 export default function SystemLogsPanel() {
-  const [activeTab, setActiveTab] = useState('System Logs');
-
-  const tabs = [
-    { name: 'System Overview', icon: Activity },
-    { name: 'All Accounts', icon: Users },
-    { name: 'System Logs', icon: Database },
-    { name: 'Platform Settings', icon: Settings },
-    { name: 'Analytics', icon: BarChart3 },
-  ];
-
   const logs = [
     { time: '14:32', category: 'Auth', description: 'Admin login', user: 'Admin Kathmandu' },
     { time: '14:15', category: 'Registration', description: 'New guide registered', user: 'Dorje Tamang' },

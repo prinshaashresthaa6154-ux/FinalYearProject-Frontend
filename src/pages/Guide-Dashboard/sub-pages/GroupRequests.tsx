@@ -1,153 +1,151 @@
-import { useState } from "react";
-import { Check, MessageCircle, X } from "lucide-react";
-
-interface JoinRequest {
-  id: number;
-  initials: string;
-  name: string;
-  paid: boolean;
-  location: string;
-  date: string;
-  trip: string;
-  spots: number;
-}
-
-const initialRequests: JoinRequest[] = [
-  {
-    id: 1,
-    initials: "EC",
-    name: "Emily Chen",
-    paid: true,
-    location: "Singapore",
-    date: "Mar 22, 2026",
-    trip: "Everest Base Camp Group Trek",
-    spots: 1,
-  },
-  {
-    id: 2,
-    initials: "DK",
-    name: "David Kim",
-    paid: true,
-    location: "South Korea",
-    date: "Mar 22, 2026",
-    trip: "Everest Base Camp Group Trek",
-    spots: 1,
-  },
-  {
-    id: 3,
-    initials: "AM",
-    name: "Anna Müller",
-    paid: false,
-    location: "Germany",
-    date: "Apr 02, 2026",
-    trip: "Annapurna Base Camp Group",
-    spots: 2,
-  },
-  {
-    id: 4,
-    initials: "RL",
-    name: "Ryan Lopez",
-    paid: true,
-    location: "USA",
-    date: "Apr 10, 2026",
-    trip: "Langtang Valley Group Trek",
-    spots: 1,
-  },
-];
+import { CalendarDays, Check, Flag, LoaderCircle, MapPin, MessageCircle, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
+import { getApiError } from "../../../api/axios";
+import { Button, EmptyState, ErrorState, Modal, Textarea } from "../../../components/ui";
+import {
+  guideBookingService,
+  type GuideBooking,
+} from "../../../services/guideBookingService";
 
 export default function GroupRequests() {
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState<GuideBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState<number | null>(null);
+  const [rejecting, setRejecting] = useState<GuideBooking | null>(null);
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
-  const removeRequest = (id: number) => {
-    setRequests((prev) => prev.filter((req) => req.id !== id));
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await guideBookingService.requests(0, 100);
+      setRequests(response.data.data?.content ?? []);
+    } catch (requestError) {
+      const details = getApiError(requestError);
+      if (details.status === 404) {
+        // Some backend versions return 404 instead of an empty page when the
+        // assigned guide has not received any booking requests yet.
+        setRequests([]);
+      } else {
+        setError(details.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const accept = async (booking: GuideBooking) => {
+    setProcessing(booking.id);
+    setError("");
+    try {
+      const response = await guideBookingService.accept(booking.id);
+      setNotice(response.data.message || "Guide booking accepted.");
+      await load();
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setProcessing(null);
+    }
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-[#1a130e] tracking-tight font-serif">
-            Group Trip Join Requests
-          </h2>
-          <p className="text-sm text-gray-400 mt-0.5">
-            Approve to add tourists to the group chat · {requests.length}{" "}
-            pending
-          </p>
-        </div>
-      </div>
+  const reject = async () => {
+    if (!rejecting) return;
+    setProcessing(rejecting.id);
+    setError("");
+    try {
+      const response = await guideBookingService.reject(rejecting.id, reason);
+      setNotice(response.data.message || "Guide booking rejected.");
+      setRejecting(null);
+      setReason("");
+      await load();
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setProcessing(null);
+    }
+  };
 
-      {requests.length === 0 ? (
-        <div className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm p-10 text-center">
-          <p className="text-sm text-gray-400">No pending join requests</p>
-        </div>
+  const complete = async (booking: GuideBooking) => {
+    if (!window.confirm(`Mark the service for ${booking.user.name} as completed?`)) return;
+    setProcessing(booking.id);
+    setError("");
+    try {
+      const response = await guideBookingService.complete(booking.id);
+      setNotice(response.data.message || "Guide trip completed.");
+      await load();
+    } catch (requestError) {
+      setError(getApiError(requestError).message);
+    } finally {
+      setProcessing(null);
+    }
+  };
+
+  if (loading)
+    return <div className="grid min-h-64 place-items-center"><LoaderCircle className="h-8 w-8 animate-spin text-[#a62922]" /></div>;
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#a62922]">Direct bookings</p>
+        <h2 className="mt-1 font-display text-3xl font-bold">Guide requests</h2>
+        <p className="mt-2 text-sm text-gray-500">Accepting a pending request confirms it and creates the traveler conversation.</p>
+      </div>
+      {notice && <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{notice}</p>}
+      {error && <ErrorState message={error} onRetry={() => void load()} />}
+      {!error && requests.length === 0 ? (
+        <EmptyState title="No guide requests" description="Direct booking requests assigned to you will appear here." />
       ) : (
         <div className="space-y-3">
-          {requests.map((req) => (
-            <div
-              key={req.id}
-              className="bg-white border border-[#eae3dc] rounded-2xl shadow-sm px-5 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
-            >
-              <div className="flex items-start gap-3 min-w-0">
-                <div className="w-11 h-11 rounded-full bg-[#1e2a44] text-white flex items-center justify-center text-sm font-semibold shrink-0">
-                  {req.initials}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-[#1a130e]">
-                      {req.name}
-                    </span>
-                    {req.paid ? (
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-[#b31919] text-white">
-                        Paid
-                      </span>
-                    ) : (
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800">
-                        Awaiting payment
-                      </span>
-                    )}
-                    <span className="text-xs text-gray-400">
-                      {req.spots} spot{req.spots > 1 ? "s" : ""}
-                    </span>
+          {requests.map((booking) => (
+            <article key={booking.id} className="rounded-2xl border border-[#eae3dc] bg-white p-5 shadow-sm">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-display text-xl font-bold">{booking.user.name}</h3>
+                    <span className="rounded-full bg-[#f5e6e3] px-3 py-1 text-xs font-bold text-[#a62922]">{booking.status}</span>
                   </div>
-                  <p className="text-sm text-gray-400 mt-0.5">
-                    {req.location} · {req.date}
-                  </p>
-                  <p className="text-sm text-[#2c2520] mt-1">
-                    Trip: {req.trip}
-                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-lg bg-[#faf7f4] p-3"><p className="text-xs font-bold uppercase tracking-wide text-gray-500">Destination</p><p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold"><MapPin className="h-4 w-4 text-[#a62922]" />{booking.destination?.name ?? "Destination unavailable"}</p></div>
+                    <div className="rounded-lg bg-[#faf7f4] p-3"><p className="text-xs font-bold uppercase tracking-wide text-gray-500">Service dates</p><p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold"><CalendarDays className="h-4 w-4 text-[#a62922]" />{booking.startDate} to {booking.endDate}</p><p className="mt-1 text-xs text-gray-500">{booking.participants ?? 1} traveler(s)</p></div>
+                  </div>
+                  {booking.dailyRate != null && <p className="mt-2 text-sm font-semibold text-[#a62922]">{booking.currency} {Number(booking.dailyRate).toLocaleString()} / day{booking.billableDays ? ` · ${booking.billableDays} day(s)` : ""}</p>}
+                  {booking.totalAmount != null && <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-600"><span>Gross: <b>{booking.currency} {Number(booking.totalAmount).toLocaleString()}</b></span><span>Commission ({booking.commissionPercentage}%): <b>{booking.currency} {Number(booking.commissionAmount).toLocaleString()}</b></span><span>Your net: <b>{booking.currency} {Number(booking.guideNetAmount).toLocaleString()}</b></span><span>Payment: <b>{booking.paymentStatus}</b></span></div>}
+                  {booking.requestMessage && <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f4741]">{booking.requestMessage}</p>}
+                  {booking.rejectionReason && <p className="mt-3 text-sm text-red-700">Reason: {booking.rejectionReason}</p>}
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  {booking.status === "PENDING" && booking.type === "DIRECT" && (
+                    <>
+                      <Button loading={processing === booking.id} onClick={() => void accept(booking)}><Check className="h-4 w-4" /> Accept</Button>
+                      <Button variant="secondary" disabled={processing === booking.id} onClick={() => { setRejecting(booking); setReason(""); }}><X className="h-4 w-4" /> Reject</Button>
+                    </>
+                  )}
+                  {booking.status === "CONFIRMED" && booking.conversationId && (
+                    <Link to={`/guide/messages?conversationId=${booking.conversationId}`} className="inline-flex items-center gap-2 rounded-lg bg-[#a62922] px-4 py-2.5 text-sm font-bold text-white"><MessageCircle className="h-4 w-4" /> Message</Link>
+                  )}
+                  {booking.status === "CONFIRMED" && booking.type === "DIRECT" && booking.endDate && booking.endDate <= new Date().toISOString().slice(0, 10) && (
+                    <Button loading={processing === booking.id} onClick={() => void complete(booking)}><Flag className="h-4 w-4" /> Complete trip</Button>
+                  )}
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => removeRequest(req.id)}
-                  disabled={!req.paid}
-                  className="inline-flex items-center gap-1.5 bg-[#b31919] hover:bg-[#941414] disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition"
-                >
-                  <Check className="w-4 h-4" />
-                  Approve & Add
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 border border-[#dcd3cc] text-[#6e5e54] hover:bg-[#faf7f4] px-4 py-2 rounded-lg text-sm font-medium transition"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Chat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeRequest(req.id)}
-                  className="p-2 text-[#b31919] hover:bg-red-50 rounded-lg transition"
-                  aria-label={`Decline ${req.name}`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
+      <Modal open={rejecting !== null} onClose={() => !processing && setRejecting(null)} title="Reject guide request">
+        <Textarea label="Reason" value={reason} onChange={(event) => setReason(event.target.value)} maxLength={1000} required />
+        <div className="mt-5 flex justify-end gap-3">
+          <Button variant="secondary" onClick={() => setRejecting(null)} disabled={Boolean(processing)}>Keep pending</Button>
+          <Button onClick={() => void reject()} loading={Boolean(processing)} disabled={!reason.trim()}>Reject request</Button>
+        </div>
+      </Modal>
     </div>
   );
 }

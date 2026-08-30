@@ -1,105 +1,21 @@
-import { 
-  Users, Database, ShieldAlert, Briefcase, Wallet, 
-  Globe, ShieldCheck, Clock 
-} from 'lucide-react';
+import { Banknote, BriefcaseBusiness, CheckCircle2, Clock3, Compass, CreditCard, FileCheck2, FolderTree, LoaderCircle, Map, ShieldCheck, Users } from "lucide-react";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
+import { Link } from "react-router";
+import { getApiError } from "../../../api/axios";
+import { ErrorState } from "../../../components/ui";
+import { superadminService, type SuperadminDashboardData } from "../../../services/superadminService";
 
-const SystemOverview = () => {
-     const stats = [
-    { label: 'Total Users', value: '15,847', trend: '+8.2%', icon: Users, iconColor: 'text-red-500', bgIcon: 'bg-red-50' },
-    { label: 'Active Admins', value: '12', trend: '+2', icon: ShieldAlert, iconColor: 'text-orange-500', bgIcon: 'bg-orange-50' },
-    { label: 'Freelance Guides', value: '245', trend: '+15', icon: Briefcase, iconColor: 'text-teal-500', bgIcon: 'bg-teal-50' },
-    { label: 'System Revenue', value: 'NPR 1.2Cr', trend: '+32%', icon: Wallet, iconColor: 'text-blue-500', bgIcon: 'bg-blue-50' },
+export default function SystemOverview() {
+  const [data, setData] = useState<SuperadminDashboardData | null>(null); const [pendingAdmins, setPendingAdmins] = useState(0); const [pendingGuides, setPendingGuides] = useState(0); const [loading, setLoading] = useState(true); const [error, setError] = useState("");
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const [dashboard, admins, guides] = await Promise.all([superadminService.dashboard(), superadminService.verifications({ role: "ADMIN", status: "PENDING", page: 0, size: 1 }), superadminService.verifications({ role: "FREELANCE_GUIDE", status: "PENDING", page: 0, size: 1 })]); setData(dashboard.data.data ?? null); setPendingAdmins(admins.data.data?.totalElements ?? 0); setPendingGuides(guides.data.data?.totalElements ?? 0); } catch (requestError) { setError(getApiError(requestError).message); } finally { setLoading(false); } }, []); useEffect(() => { void load(); }, [load]);
+  if (loading) return <div className="grid min-h-[55vh] place-items-center"><LoaderCircle className="h-9 w-9 animate-spin text-[#b31919]" /></div>;
+  if (error || !data) return <ErrorState message={error || "Superadmin dashboard data is unavailable."} onRetry={() => void load()} />;
+  const payments = Object.values(data.paymentStatistics).reduce((sum, value) => sum + value, 0);
+  const overallTransactions = Number(data.overallTransactions);
+  const totalRevenue = Number(data.totalRevenue);
+  const metrics: Array<{ label: string; value: string | number; icon: ComponentType<{ className?: string }>; path: string }> = [
+    { label: "Users", value: data.totalUsers, icon: Users, path: "/superadmin/users" }, { label: "Admins", value: data.totalAdmins, icon: ShieldCheck, path: "/superadmin/admins" }, { label: "Guides", value: data.totalGuides, icon: BriefcaseBusiness, path: "/superadmin/guides" }, { label: "Pending Admin Verification", value: pendingAdmins, icon: Clock3, path: "/superadmin/verifications" }, { label: "Pending Guide Verification", value: pendingGuides, icon: FileCheck2, path: "/superadmin/verifications" }, { label: "Destinations", value: data.totalDestinations, icon: Compass, path: "/superadmin/destinations" }, { label: "Categories", value: data.totalCategories, icon: FolderTree, path: "/superadmin/categories" }, { label: "Trips", value: data.totalTrips, icon: Map, path: "/superadmin/trips" }, { label: "Payments", value: payments, icon: CreditCard, path: "/superadmin/payments" }, { label: "Overall Transactions", value: `NPR ${overallTransactions.toLocaleString()}`, icon: CreditCard, path: "/superadmin/payments" }, { label: "Total Revenue", value: `NPR ${totalRevenue.toLocaleString()}`, icon: Banknote, path: "/superadmin/reports" },
   ];
-
-  const userDistribution = [
-    { role: 'Tourists', count: '15,200', percentage: 95.9, color: 'bg-[#b31919]' },
-    { role: 'Freelance Guides', count: '245', percentage: 1.5, color: 'bg-teal-500' },
-    { role: 'Admins', count: '12', percentage: 0.1, color: 'bg-orange-400' },
-    { role: 'Super Admin', count: '1', percentage: 0.01, color: 'bg-indigo-500' },
-  ];
-
-  const systemHealth = [
-    { name: 'Server Status', status: 'Operational', color: 'bg-red-800 text-white', icon: Database },
-    { name: 'Database', status: 'Connected', color: 'bg-red-800 text-white', icon: Database },
-    { name: 'API Gateway', status: 'Active', color: 'bg-red-600 text-white', icon: Globe },
-    { name: 'SSL Certificate', status: 'Valid', color: 'bg-red-600 text-white', icon: ShieldCheck },
-    { name: 'Uptime', status: '99.97%', color: 'bg-red-600 text-white', icon: Clock },
-  ];
-
-  return (
-    <div>
-        {/* Top Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="bg-white border border-[#eae3dc] rounded-2xl p-5 shadow-sm relative flex flex-col justify-between min-h-[130px]">
-                <div className="flex justify-between items-start">
-                  <div className={`p-2.5 rounded-xl ${stat.bgIcon}`}>
-                    <Icon className={`w-5 h-5 ${stat.iconColor}`} />
-                  </div>
-                  <span className="text-xs font-semibold text-gray-500 flex items-center gap-0.5">
-                    📈 {stat.trend}
-                  </span>
-                </div>
-                <div className="mt-4">
-                  <div className="text-2xl font-bold tracking-tight text-[#1a130e]">{stat.value}</div>
-                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Analytics Section Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* User Role Distribution Card */}
-          <div className="bg-white border border-[#eae3dc] rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#1a130e] mb-6 tracking-tight font-serif">User Role Distribution</h2>
-            <div className="space-y-5">
-              {userDistribution.map((item, idx) => (
-                <div key={idx} className="space-y-1.5">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span className="text-gray-700 flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${item.color}`}></span>
-                      {item.role}
-                    </span>
-                    <span className="text-gray-400 font-mono">{item.count}</span>
-                  </div>
-                  <div className="w-full bg-[#f3ede8] h-2 rounded-full overflow-hidden">
-                    <div 
-                      className={`${item.color} h-full rounded-full transition-all duration-500`} 
-                      style={{ width: `${item.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* System Health Card */}
-          <div className="bg-white border border-[#eae3dc] rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-[#1a130e] mb-6 tracking-tight font-serif">System Health</h2>
-            <div className="space-y-3.5">
-              {systemHealth.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <div key={idx} className="flex items-center justify-between bg-[#faf7f4] border border-[#f0eae4] rounded-xl p-3">
-                    <div className="flex items-center gap-3 text-sm font-medium text-gray-700">
-                      <Icon className="w-4 h-4 text-gray-400" />
-                      <span>{item.name}</span>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${item.color}`}>
-                      {item.status}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-    </div>
-  )
+  const quick = [{ label: "Pending Verification", path: "/superadmin/verifications" }, { label: "Users", path: "/superadmin/users" }, { label: "Admins", path: "/superadmin/admins" }, { label: "Guides", path: "/superadmin/guides" }, { label: "Reports", path: "/superadmin/reports" }, { label: "Audit Logs", path: "/superadmin/audit-logs" }];
+  return <div className="space-y-8"><header className="rounded-3xl bg-[#251c17] p-8 text-white"><p className="text-xs font-bold uppercase tracking-[0.24em] text-orange-300">Platform command center</p><h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">Superadmin Dashboard</h1><p className="mt-4 max-w-2xl leading-7 text-white/70">Monitor accounts, content, commerce, verification, and platform activity from backend-wide aggregates.</p></header><section className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-7">{metrics.map(({ label, value, icon: Icon, path }) => <Link key={label} to={path} className="rounded-2xl border border-[#eae3dc] bg-white p-4 shadow-sm transition hover:-translate-y-0.5"><span className="grid h-9 w-9 place-items-center rounded-xl bg-red-50 text-[#b31919]"><Icon className="h-4 w-4" /></span><p className="mt-4 break-words font-display text-2xl font-bold">{value}</p><p className="mt-1 text-xs font-semibold text-gray-500">{label}</p></Link>)}</section><section className="rounded-2xl border bg-white p-6 shadow-sm"><h2 className="font-display text-2xl font-bold">Quick Actions</h2><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">{quick.map((item) => <Link key={item.path} to={item.path} className="rounded-xl border border-[#e5ddd6] px-4 py-3 text-center text-sm font-bold hover:border-[#b31919] hover:text-[#b31919]">{item.label}</Link>)}</div></section><div className="grid gap-6 lg:grid-cols-2"><section className="rounded-2xl border bg-white p-6 shadow-sm"><h2 className="font-display text-2xl font-bold">Payment Status</h2><div className="mt-5 space-y-4">{Object.entries(data.paymentStatistics).map(([label, count]) => <div key={label}><div className="flex justify-between text-sm"><span className="font-semibold capitalize">{label}</span><span>{count}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100"><div className="h-full bg-[#b31919]" style={{ width: `${payments ? count / payments * 100 : 0}%` }} /></div></div>)}</div></section><section className="rounded-2xl border bg-white p-6 shadow-sm"><h2 className="font-display text-2xl font-bold">Recent Platform Activity</h2>{data.recentActivities.length === 0 ? <p className="mt-8 text-center text-sm text-gray-500">No platform activity yet.</p> : <div className="mt-5 space-y-3">{data.recentActivities.slice(0, 8).map((activity) => <div key={activity.id} className="border-b pb-3"><div className="flex justify-between gap-3"><b className="text-sm">{activity.title}</b><span className="text-[10px] text-gray-400">{new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(new Date(activity.createdAt))}</span></div><p className="mt-1 text-xs text-gray-500">{activity.userEmail} · {activity.type.replaceAll("_", " ")}</p></div>)}</div>}</section></div><section className="rounded-2xl border bg-white p-6 shadow-sm"><h2 className="font-display text-2xl font-bold">Platform Publishing</h2><div className="mt-5 flex items-center gap-5"><div className="grid h-20 w-20 place-items-center rounded-full bg-green-50 text-green-700"><CheckCircle2 className="h-8 w-8" /></div><div><p className="text-3xl font-bold">{data.publishedTrips} / {data.totalTrips}</p><p className="text-sm text-gray-500">published trips across the platform</p></div></div></section></div>;
 }
-
-export default SystemOverview
